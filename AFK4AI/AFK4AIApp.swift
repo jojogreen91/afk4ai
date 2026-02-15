@@ -75,11 +75,10 @@ struct MenuBarView: View {
             let canLock = appState.selectedWindow != nil && hasScreen && hasAccessibility
 
             Button {
+                openWindow(id: "settings")
+                NSApp.activate(ignoringOtherApps: true)
                 if canLock {
                     appState.startLock()
-                } else {
-                    openWindow(id: "settings")
-                    NSApp.activate(ignoringOtherApps: true)
                 }
             } label: {
                 if appState.selectedWindow == nil {

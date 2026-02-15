@@ -115,10 +115,6 @@ struct LockScreenView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(primary.opacity(0.15), lineWidth: 1)
-        )
     }
 
     // MARK: - Unlock Area
