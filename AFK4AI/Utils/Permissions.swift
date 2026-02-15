@@ -5,23 +5,12 @@ import ScreenCaptureKit
 
 enum Permissions {
     static func hasScreenRecordingPermission() -> Bool {
-        // CGPreflightScreenCaptureAccess can return stale results on some macOS versions
-        if CGPreflightScreenCaptureAccess() {
-            return true
-        }
-        // Fallback: check if we can actually see windows from other processes
-        guard let windowList = CGWindowListCopyWindowInfo(
-            [.optionOnScreenOnly, .excludeDesktopElements],
-            kCGNullWindowID
-        ) as? [[String: Any]] else {
-            return false
-        }
-        let myPID = ProcessInfo.processInfo.processIdentifier
-        return windowList.contains { info in
-            guard let pid = info[kCGWindowOwnerPID as String] as? Int32,
-                  let name = info[kCGWindowOwnerName as String] as? String else { return false }
-            return pid != myPID && name != "Window Server"
-        }
+        // On macOS 14+, CGWindowListCopyWindowInfo returns metadata even without
+        // screen recording permission, but CGWindowListCreateImage returns nil.
+        // Use CGPreflightScreenCaptureAccess as the sole check to avoid false positives.
+        let result = CGPreflightScreenCaptureAccess()
+        print("[Permissions] hasScreenRecordingPermission: CGPreflight=\(result)")
+        return result
     }
 
     static func hasAccessibilityPermission() -> Bool {
@@ -45,6 +34,13 @@ enum Permissions {
     }
 
     static func requestScreenRecordingPermission() {
+        // Reset stale TCC entry for ad-hoc signed apps (same reason as accessibility)
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+        process.arguments = ["reset", "ScreenCapture", Bundle.main.bundleIdentifier ?? "com.afk4ai.AFK4AI"]
+        try? process.run()
+        process.waitUntilExit()
+        print("[Permissions] TCC ScreenCapture reset, requesting access...")
         CGRequestScreenCaptureAccess()
     }
 
