@@ -70,21 +70,36 @@ struct MenuBarView: View {
                 Label("잠금 해제", systemImage: "touchid")
             }
         } else {
+            let hasScreen = Permissions.hasScreenRecordingPermission()
+            let hasAccessibility = Permissions.hasAccessibilityPermission()
+            let canLock = appState.selectedWindow != nil && hasScreen && hasAccessibility
+
             Button {
-                let hasPermissions = Permissions.hasScreenRecordingPermission() && Permissions.hasAccessibilityPermission()
-                if appState.selectedWindow != nil && hasPermissions {
+                if canLock {
                     appState.startLock()
                 } else {
                     openWindow(id: "settings")
                     NSApp.activate(ignoringOtherApps: true)
                 }
             } label: {
-                Label(
-                    appState.selectedWindow != nil ? "잠금 시작" : "창을 먼저 선택하세요",
-                    systemImage: "lock.fill"
-                )
+                if appState.selectedWindow == nil {
+                    Label("창을 먼저 선택하세요", systemImage: "macwindow")
+                } else if !hasScreen || !hasAccessibility {
+                    Label("권한 설정 필요", systemImage: "exclamationmark.triangle")
+                } else {
+                    Label("잠금 시작", systemImage: "lock.fill")
+                }
             }
-            .disabled(appState.selectedWindow == nil)
+            .disabled(!canLock)
+
+            if !hasScreen {
+                Label("화면 녹화 권한 필요", systemImage: "xmark.circle")
+                    .disabled(true)
+            }
+            if !hasAccessibility {
+                Label("손쉬운 사용 권한 필요", systemImage: "xmark.circle")
+                    .disabled(true)
+            }
         }
 
         Divider()
