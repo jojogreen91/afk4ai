@@ -3,9 +3,25 @@ import SwiftUI
 struct MetricsBarView: View {
     let metrics: SystemMetrics
     var primary: Color
+    var elapsedTime: String?
 
     var body: some View {
         HStack(spacing: 0) {
+            // Elapsed time (leftmost)
+            if let elapsed = elapsedTime {
+                HStack(spacing: 8) {
+                    Image(systemName: "clock")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(primary.opacity(0.7))
+
+                    Text(elapsed)
+                        .font(Theme.mono(18, weight: .bold))
+                        .foregroundColor(primary)
+                }
+
+                metricDivider
+            }
+
             MetricGaugeView(
                 icon: "cpu",
                 label: "CPU",

@@ -30,23 +30,24 @@ struct LockScreenView: View {
 
             VStack(spacing: 0) {
                 // Marquee banner
-                bannerWithTime
+                marqueeBanner
 
-                // System metrics bar (top, prominent)
+                // System metrics bar with elapsed time
                 MetricsBarView(
                     metrics: appState.systemMetrics,
-                    primary: primary
+                    primary: primary,
+                    elapsedTime: formattedElapsed
                 )
 
-                // Stream area takes maximum space
+                // Stream area
                 streamArea
                     .padding(.horizontal, 16)
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
+                    .padding(.top, 10)
+                    .padding(.bottom, 10)
 
-                // Compact unlock area
+                // Unlock area
                 unlockArea
-                    .padding(.bottom, 12)
+                    .padding(.vertical, 20)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -60,40 +61,16 @@ struct LockScreenView: View {
         }
     }
 
-    // MARK: - Banner with Elapsed Time (compact)
+    // MARK: - Marquee Banner
 
-    private var bannerWithTime: some View {
-        ZStack {
-            // Scrolling marquee background
-            MarqueeBanner(text: "AFK4AI", textColor: bannerText)
-
-            // Elapsed time overlay (right side)
-            HStack {
-                Spacer()
-
-                HStack(spacing: 6) {
-                    GlowDot(color: bannerText, size: 5, animate: true)
-                    Text(formattedElapsed)
-                        .font(Theme.mono(13, weight: .bold))
-                        .foregroundColor(bannerText)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 5)
-                .background(primary)
-                .clipShape(Capsule())
-                .overlay(
-                    Capsule()
-                        .stroke(bannerText.opacity(0.2), lineWidth: 1)
-                )
-                .padding(.trailing, 12)
-            }
-        }
-        .frame(height: 44)
-        .background(primary)
-        .shadow(color: primary.opacity(0.3), radius: 15, y: 3)
+    private var marqueeBanner: some View {
+        MarqueeBanner(text: "AFK4AI", textColor: bannerText)
+            .frame(height: 44)
+            .background(primary)
+            .shadow(color: primary.opacity(0.3), radius: 15, y: 3)
     }
 
-    // MARK: - Stream Area (maximized)
+    // MARK: - Stream Area
 
     private var streamArea: some View {
         ZStack {
@@ -146,10 +123,10 @@ struct LockScreenView: View {
         )
     }
 
-    // MARK: - Unlock Area (compact)
+    // MARK: - Unlock Area
 
     private var unlockArea: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 10) {
             Button {
                 guard !isAuthenticating else { return }
                 isAuthenticating = true
@@ -172,14 +149,14 @@ struct LockScreenView: View {
                             .tint(.white)
                     } else {
                         Image(systemName: "touchid")
-                            .font(.system(size: 16))
+                            .font(.system(size: 18))
                     }
                     Text(isAuthenticating ? "인증 중..." : "잠금 해제")
-                        .font(Theme.display(13, weight: .bold))
+                        .font(Theme.display(14, weight: .bold))
                 }
                 .foregroundColor(.white.opacity(0.7))
-                .padding(.horizontal, 24)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 28)
+                .padding(.vertical, 12)
                 .background(
                     Capsule()
                         .fill(Color.white.opacity(0.08))
@@ -193,7 +170,7 @@ struct LockScreenView: View {
 
             if authFailed {
                 Text("인증에 실패했습니다")
-                    .font(Theme.display(10))
+                    .font(Theme.display(11))
                     .foregroundColor(.red.opacity(0.7))
             }
 
