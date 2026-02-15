@@ -201,10 +201,15 @@ struct LockScreenView: View {
                     .foregroundColor(.red.opacity(0.7))
             }
 
-            Text("AFK4AI")
-                .font(Theme.display(8, weight: .bold))
-                .tracking(4)
-                .foregroundColor(.white.opacity(0.1))
+            Button {
+                appState.stopLock()
+            } label: {
+                Text("비상 탈출")
+                    .font(Theme.display(10, weight: .medium))
+                    .foregroundColor(.white.opacity(0.2))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 4)
         }
     }
 
