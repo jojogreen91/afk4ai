@@ -1,6 +1,7 @@
 import Foundation
 import CoreGraphics
 import AppKit
+import ScreenCaptureKit
 
 enum Permissions {
     static func hasScreenRecordingPermission() -> Bool {
@@ -45,6 +46,16 @@ enum Permissions {
 
     static func requestScreenRecordingPermission() {
         CGRequestScreenCaptureAccess()
+    }
+
+    /// Pre-trigger ScreenCaptureKit permission dialog so it appears
+    /// in the setup screen, not during lock activation.
+    /// Ad-hoc signed apps get a new code hash on every rebuild,
+    /// so the dialog reappears after each build.
+    static func preauthorizeScreenCapture() {
+        Task {
+            _ = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+        }
     }
 
     static func openScreenRecordingSettings() {
