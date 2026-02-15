@@ -28,7 +28,7 @@ struct LockScreenView: View {
                 .blur(radius: 150)
                 .offset(x: 250, y: 200)
 
-            VStack(spacing: 0) {
+            VStack(spacing: 12) {
                 // Marquee banner
                 marqueeBanner
 
@@ -42,8 +42,6 @@ struct LockScreenView: View {
                 // Stream area
                 streamArea
                     .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 10)
 
                 // Unlock area
                 unlockArea

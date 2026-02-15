@@ -152,7 +152,7 @@ private struct NetworkMetricView: View {
                     .font(Theme.mono(14, weight: .bold))
                     .foregroundColor(.white.opacity(0.9))
                     .monospacedDigit()
-                    .frame(minWidth: 70, alignment: .trailing)
+                    .frame(width: 80, alignment: .trailing)
             }
 
             HStack(spacing: 5) {
@@ -163,7 +163,7 @@ private struct NetworkMetricView: View {
                     .font(Theme.mono(14, weight: .bold))
                     .foregroundColor(.white.opacity(0.9))
                     .monospacedDigit()
-                    .frame(minWidth: 70, alignment: .trailing)
+                    .frame(width: 80, alignment: .trailing)
             }
         }
     }
