@@ -134,7 +134,8 @@ struct SetupView: View {
                     title: "손쉬운 사용",
                     description: "잠금 중 키보드/마우스 입력을 차단합니다",
                     granted: hasAccessibilityPermission,
-                    action: { Permissions.requestAccessibilityPermission() }
+                    action: { Permissions.requestAccessibilityPermission() },
+                    hint: !hasAccessibilityPermission ? "허용 후에도 인식 안 되면 버튼을 다시 눌러주세요" : nil
                 )
             }
             .background(Theme.surfaceDark)
@@ -146,7 +147,7 @@ struct SetupView: View {
         }
     }
 
-    private func permissionRow(icon: String, title: String, description: String, granted: Bool, action: @escaping () -> Void) -> some View {
+    private func permissionRow(icon: String, title: String, description: String, granted: Bool, action: @escaping () -> Void, hint: String? = nil) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 16))
@@ -160,6 +161,11 @@ struct SetupView: View {
                 Text(description)
                     .font(Theme.display(11))
                     .foregroundColor(.white.opacity(0.35))
+                if let hint = hint {
+                    Text(hint)
+                        .font(Theme.display(10))
+                        .foregroundColor(.yellow.opacity(0.6))
+                }
             }
 
             Spacer()
