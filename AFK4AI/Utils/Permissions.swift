@@ -1,6 +1,7 @@
 import Foundation
 import CoreGraphics
 import AppKit
+import ScreenCaptureKit
 
 enum Permissions {
     static func hasScreenRecordingPermission() -> Bool {
@@ -45,6 +46,14 @@ enum Permissions {
 
     static func requestScreenRecordingPermission() {
         CGRequestScreenCaptureAccess()
+    }
+
+    /// Pre-trigger screen recording permission dialog via SCShareableContent.
+    /// This must be called during setup so the dialog appears before lock activation.
+    static func preauthorizeScreenCapture() {
+        Task {
+            _ = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+        }
     }
 
     static func openScreenRecordingSettings() {
