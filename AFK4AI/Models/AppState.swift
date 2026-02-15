@@ -104,10 +104,18 @@ class AppState: ObservableObject {
     }
 
     private func startStreaming() {
-        guard let window = selectedWindow else { return }
+        guard let window = selectedWindow else {
+            print("[AppState] startStreaming: no selectedWindow!")
+            return
+        }
+        print("[AppState] startStreaming: windowID=\(window.windowID) name=\(window.displayName)")
         windowCaptureService = WindowCaptureService(windowID: window.windowID)
         windowCaptureService?.startStreaming { [weak self] image in
+            let isFirst = self?.capturedImage == nil
             self?.capturedImage = image
+            if isFirst {
+                print("[AppState] First captured image received: \(image.size)")
+            }
         }
     }
 
