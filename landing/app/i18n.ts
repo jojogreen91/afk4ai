@@ -26,9 +26,13 @@ export const t = {
   features: {
     title: { ko: "", en: "" },
     titleEnd: { ko: "가 맥북을 지켜줍니다", en: " guards your Mac" },
-    subtitle: {
-      ko: "AI 작업 돌려놓고 밖에 나가세요. 화면 잠그고 실시간으로 확인하면 됩니다.",
-      en: "Run your AI tasks, lock the screen, and step outside. Monitor everything in real time.",
+    subtitle1: {
+      ko: "AI 작업 돌려놓고 밖에 나가세요.",
+      en: "Run your AI tasks, lock the screen, and step outside.",
+    },
+    subtitle2: {
+      ko: "화면 잠그고 실시간으로 확인하면 됩니다.",
+      en: "Monitor everything in real time.",
     },
     items: [
       {
