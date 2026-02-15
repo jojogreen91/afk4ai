@@ -4,7 +4,23 @@ import AppKit
 
 enum Permissions {
     static func hasScreenRecordingPermission() -> Bool {
-        CGPreflightScreenCaptureAccess()
+        // CGPreflightScreenCaptureAccess can return stale results on some macOS versions
+        if CGPreflightScreenCaptureAccess() {
+            return true
+        }
+        // Fallback: check if we can actually see windows from other processes
+        guard let windowList = CGWindowListCopyWindowInfo(
+            [.optionOnScreenOnly, .excludeDesktopElements],
+            kCGNullWindowID
+        ) as? [[String: Any]] else {
+            return false
+        }
+        let myPID = ProcessInfo.processInfo.processIdentifier
+        return windowList.contains { info in
+            guard let pid = info[kCGWindowOwnerPID as String] as? Int32,
+                  let name = info[kCGWindowOwnerName as String] as? String else { return false }
+            return pid != myPID && name != "Window Server"
+        }
     }
 
     static func hasAccessibilityPermission() -> Bool {
