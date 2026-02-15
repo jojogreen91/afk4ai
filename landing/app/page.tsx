@@ -228,7 +228,9 @@ function FeaturesSection({ lang }: { lang: Lang }) {
             {t.features.title[lang]} <span className="text-ember">AFK4AI</span>{t.features.titleEnd[lang]}
           </h2>
           <p className="mx-auto max-w-lg text-lg text-text-secondary">
-            {t.features.subtitle[lang]}
+            {t.features.subtitle1[lang]}
+            <br />
+            {t.features.subtitle2[lang]}
           </p>
         </div>
 
