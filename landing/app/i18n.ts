@@ -24,11 +24,11 @@ export const t = {
     scroll: { ko: "스크롤", en: "Scroll" },
   },
   features: {
-    title: { ko: "왜", en: "Why" },
-    titleEnd: { ko: "인가?", en: "?" },
+    title: { ko: "", en: "" },
+    titleEnd: { ko: "가 맥북을 지켜줍니다", en: " guards your Mac" },
     subtitle: {
-      ko: "컴퓨터를 켜두고 자리를 비울 때 꼭 필요한 기능들을 모았습니다.",
-      en: "Everything you need when leaving your computer unattended.",
+      ko: "AI 작업 돌려놓고 밖에 나가세요. 화면 잠그고 실시간으로 확인하면 됩니다.",
+      en: "Run your AI tasks, lock the screen, and step outside. Monitor everything in real time.",
     },
     items: [
       {
