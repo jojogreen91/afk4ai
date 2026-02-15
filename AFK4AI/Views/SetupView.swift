@@ -48,6 +48,7 @@ struct SetupView: View {
         .onAppear {
             appState.refreshWindowList()
             checkPermissions()
+            Permissions.preauthorizeScreenCapture()
             permissionTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
                 checkPermissions()
             }
