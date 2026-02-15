@@ -28,7 +28,7 @@ function NavBar({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-surface/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <div className="flex items-center gap-4">
-          <span className="text-xl font-extrabold tracking-tight text-ember">AFK4AI</span>
+          <span className="text-2xl font-extrabold tracking-tight text-ember">AFK4AI</span>
           <span className="hidden items-center gap-3 text-xs text-text-secondary md:flex">
             <span className="text-border">|</span>
             <a href="https://github.com/jojogreen91" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 transition hover:text-text-primary">
@@ -63,22 +63,22 @@ function NavBar({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
 
 function HeroSection({ lang }: { lang: Lang }) {
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-16">
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-24">
       <div className="pointer-events-none absolute top-1/4 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-ember/5 blur-[120px]" />
 
       <div className="relative z-10 mx-auto max-w-3xl text-center">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface-light px-4 py-1.5 text-xs text-text-secondary">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface-light px-4 py-1.5 text-sm text-text-secondary">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-status-green animate-pulse-dot" />
           macOS 14.0+ &middot; Apple Silicon &amp; Intel
         </div>
 
-        <h1 className="mb-5 text-4xl leading-tight font-extrabold tracking-tight md:text-6xl md:leading-tight">
+        <h1 className="mb-5 text-5xl leading-tight font-extrabold tracking-tight md:text-7xl md:leading-tight">
           {t.hero.title1[lang]}
           <br />
           <span className="text-ember">{t.hero.title2[lang]}</span>
         </h1>
 
-        <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-text-secondary md:text-lg md:leading-relaxed">
+        <p className="mx-auto mb-8 max-w-xl text-lg leading-relaxed text-text-secondary md:text-xl md:leading-relaxed">
           {t.hero.description[lang]}
           <br className="hidden md:block" />
           {t.hero.descriptionBr[lang]}
@@ -89,14 +89,14 @@ function HeroSection({ lang }: { lang: Lang }) {
             href={GITHUB_RELEASE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl bg-ember px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-ember/20 transition hover:bg-ember-light hover:shadow-xl hover:shadow-ember/30"
+            className="inline-flex items-center gap-2 rounded-xl bg-ember px-8 py-4 text-lg font-bold text-white shadow-lg shadow-ember/20 transition hover:bg-ember-light hover:shadow-xl hover:shadow-ember/30"
           >
             <DownloadIcon />
             {t.hero.cta[lang]}
           </a>
           <a
             href="#features"
-            className="inline-flex items-center gap-2 rounded-xl border border-border px-7 py-3.5 text-base font-medium text-text-secondary transition hover:border-text-secondary hover:text-text-primary"
+            className="inline-flex items-center gap-2 rounded-xl border border-border px-8 py-4 text-lg font-medium text-text-secondary transition hover:border-text-secondary hover:text-text-primary"
           >
             {t.hero.learnMore[lang]}
           </a>
@@ -105,60 +105,104 @@ function HeroSection({ lang }: { lang: Lang }) {
 
       {/* Mock lock screen */}
       <div className="relative z-10 mx-auto mt-12 w-full max-w-3xl animate-float">
-        <div className="overflow-hidden rounded-xl border border-border bg-surface-light shadow-2xl shadow-black/40">
-          <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-            <div className="flex items-center gap-1.5">
-              <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
-              <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
-              <div className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
+        <div className="overflow-hidden rounded-xl border border-border bg-[#050505] shadow-2xl shadow-black/40">
+
+          {/* Marquee Banner */}
+          <div className="relative overflow-hidden bg-ember py-2.5 shadow-lg shadow-ember/30">
+            <div className="flex animate-marquee items-center gap-6 whitespace-nowrap" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+              {[...Array(8)].map((_, i) => (
+                <span key={i} className="flex items-center gap-2 text-sm font-bold tracking-widest text-black md:text-base">
+                  <WarningIcon /> AFK4AI
+                </span>
+              ))}
             </div>
-            <span className="text-[11px] text-text-secondary" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-              AFK4AI
-            </span>
-            <div className="w-10" />
           </div>
 
-          <div className="relative flex flex-col items-center justify-center px-6 py-14 md:py-16">
-            <div className="absolute top-0 left-0 right-0 h-1.5" style={{
-              background: "repeating-linear-gradient(135deg, #FF4D00 0px, #FF4D00 8px, transparent 8px, transparent 16px)"
-            }} />
-
-            <div className="mb-4 flex items-center gap-2.5">
-              <LockIcon />
-              <span className="text-xl font-bold tracking-wide md:text-2xl">LOCKED</span>
-            </div>
-
-            <div className="mb-6 flex items-center gap-2 text-xs text-text-secondary" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-status-green animate-pulse-dot" />
-              <span className="text-status-green">LIVE</span>
-              <span className="mx-1.5 text-border">|</span>
-              <span>01:23:45</span>
-            </div>
-
-            <div className="w-full max-w-md rounded-lg border border-border bg-surface p-3">
-              <div className="mb-2.5 flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-ember" />
-                <div className="h-1.5 w-20 rounded bg-border" />
+          {/* Metrics Bar */}
+          <div className="border-y border-ember/30 bg-black/60 px-4 py-3 md:px-6" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+            <div className="flex items-center justify-between gap-3 overflow-x-auto text-[11px] md:text-xs">
+              {/* Elapsed Time */}
+              <div className="flex shrink-0 items-center gap-2">
+                <ClockIcon />
+                <span className="text-sm font-bold text-ember md:text-base">01:23:45</span>
               </div>
-              <div className="space-y-1.5">
-                <div className="h-1.5 w-full rounded bg-border" />
-                <div className="h-1.5 w-4/5 rounded bg-border" />
-                <div className="h-1.5 w-3/5 rounded bg-ember/20" />
-                <div className="h-1.5 w-4/5 rounded bg-border" />
-                <div className="h-1.5 w-2/5 rounded bg-border" />
+              <div className="h-5 w-px bg-ember/20" />
+              {/* CPU */}
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="font-bold text-text-secondary">CPU</span>
+                <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/10 md:w-20">
+                  <div className="h-full w-[34%] rounded-full bg-ember/85" />
+                </div>
+                <span className="text-ember font-semibold">34%</span>
+              </div>
+              <div className="hidden h-5 w-px bg-ember/20 md:block" />
+              {/* MEM */}
+              <div className="hidden shrink-0 items-center gap-2 md:flex">
+                <span className="font-bold text-text-secondary">MEM</span>
+                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full w-[53%] rounded-full bg-ember/85" />
+                </div>
+                <span className="text-ember font-semibold">8.5/16GB</span>
+              </div>
+              <div className="hidden h-5 w-px bg-ember/20 md:block" />
+              {/* GPU */}
+              <div className="hidden shrink-0 items-center gap-2 md:flex">
+                <span className="font-bold text-text-secondary">GPU</span>
+                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full w-[62%] rounded-full bg-ember/85" />
+                </div>
+                <span className="text-ember font-semibold">62%</span>
+              </div>
+              <div className="hidden h-5 w-px bg-ember/20 md:block" />
+              {/* NET */}
+              <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                <span className="font-bold text-text-secondary">NET</span>
+                <span className="text-text-secondary">&uarr;</span>
+                <span className="text-ember font-semibold">1.2MB/s</span>
+                <span className="text-text-secondary">&darr;</span>
+                <span className="text-ember font-semibold">4.8MB/s</span>
               </div>
             </div>
+          </div>
 
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[11px] text-text-secondary md:gap-5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-              <span>CPU <span className="text-ember font-semibold">34%</span></span>
-              <span>GPU <span className="text-ember font-semibold">62%</span></span>
-              <span>MEM <span className="text-ember font-semibold">12.4/16 GB</span></span>
-              <span>&uarr; <span className="text-ember font-semibold">1.2 MB/s</span> &darr; <span className="text-ember font-semibold">4.8 MB/s</span></span>
+          {/* Stream Area */}
+          <div className="relative mx-4 my-4 overflow-hidden rounded-lg border border-ember/15 bg-[#0A0A0A] md:mx-5 md:my-5">
+            {/* Fake captured window content */}
+            <div className="px-5 py-6 md:px-8 md:py-10">
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-ember" />
+                  <div className="h-1.5 w-24 rounded bg-white/15" />
+                </div>
+                <div className="h-1.5 w-full rounded bg-white/8" />
+                <div className="h-1.5 w-4/5 rounded bg-white/8" />
+                <div className="h-1.5 w-3/5 rounded bg-ember/15" />
+                <div className="h-1.5 w-4/5 rounded bg-white/8" />
+                <div className="h-1.5 w-2/5 rounded bg-white/8" />
+                <div className="mt-4 h-1.5 w-1/3 rounded bg-ember/15" />
+                <div className="h-1.5 w-full rounded bg-white/8" />
+                <div className="h-1.5 w-3/4 rounded bg-white/8" />
+              </div>
             </div>
-
-            <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{
-              background: "repeating-linear-gradient(135deg, #FF4D00 0px, #FF4D00 8px, transparent 8px, transparent 16px)"
+            {/* Scanline overlay */}
+            <div className="pointer-events-none absolute inset-0" style={{
+              backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.25) 3px, rgba(0,0,0,0.25) 4px)",
+              opacity: 0.08
             }} />
+            {/* LIVE badge */}
+            <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-2.5 py-1">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse-dot" />
+              <span className="text-[9px] font-bold text-red-400" style={{ fontFamily: "'JetBrains Mono', monospace" }}>LIVE</span>
+            </div>
+          </div>
+
+          {/* Unlock Area */}
+          <div className="flex flex-col items-center gap-2 px-6 pb-6 pt-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-7 py-3">
+              <TouchIdIcon />
+              <span className="text-sm font-bold text-white/70" style={{ fontFamily: "'JetBrains Mono', monospace" }}>잠금 해제</span>
+            </div>
+            <span className="text-[10px] text-white/20" style={{ fontFamily: "'JetBrains Mono', monospace" }}>비상 탈출</span>
           </div>
         </div>
       </div>
@@ -180,10 +224,10 @@ function FeaturesSection({ lang }: { lang: Lang }) {
     <section id="features" className="px-6 py-20 md:py-24">
       <div className="mx-auto max-w-5xl">
         <div className="mb-12 text-center">
-          <h2 className="mb-3 text-3xl font-bold tracking-tight md:text-4xl">
+          <h2 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
             {t.features.title[lang]} <span className="text-ember">AFK4AI</span>{t.features.titleEnd[lang]}
           </h2>
-          <p className="mx-auto max-w-lg text-base text-text-secondary">
+          <p className="mx-auto max-w-lg text-lg text-text-secondary">
             {t.features.subtitle[lang]}
           </p>
         </div>
@@ -194,11 +238,11 @@ function FeaturesSection({ lang }: { lang: Lang }) {
               key={i}
               className="group rounded-xl border border-border bg-surface-light p-6 transition hover:border-ember/30 hover:bg-surface-lighter"
             >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-ember/10 text-ember transition group-hover:bg-ember/20">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-ember/10 text-ember transition group-hover:bg-ember/20">
                 {icons[i]}
               </div>
-              <h3 className="mb-2 text-lg font-bold">{feature.title[lang]}</h3>
-              <p className="text-sm leading-relaxed text-text-secondary">
+              <h3 className="mb-2 text-xl font-bold">{feature.title[lang]}</h3>
+              <p className="text-base leading-relaxed text-text-secondary">
                 {feature.description[lang]}
               </p>
             </div>
@@ -214,7 +258,7 @@ function HowItWorksSection({ lang }: { lang: Lang }) {
     <section id="how-it-works" className="px-6 py-20 md:py-24">
       <div className="mx-auto max-w-3xl">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+          <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
             {t.howItWorks.title1[lang]} <span className="text-ember">{t.howItWorks.title2[lang]}</span>
           </h2>
         </div>
@@ -222,12 +266,12 @@ function HowItWorksSection({ lang }: { lang: Lang }) {
         <div className="space-y-10">
           {t.howItWorks.steps.map((step, i) => (
             <div key={i} className="flex items-start gap-6">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-ember/30 bg-surface-light text-lg font-bold text-ember">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-ember/30 bg-surface-light text-xl font-bold text-ember">
                 {String(i + 1).padStart(2, "0")}
               </div>
               <div className="pt-1">
-                <h3 className="mb-1.5 text-xl font-bold">{step.title[lang]}</h3>
-                <p className="text-base leading-relaxed text-text-secondary">
+                <h3 className="mb-1.5 text-2xl font-bold">{step.title[lang]}</h3>
+                <p className="text-lg leading-relaxed text-text-secondary">
                   {step.description[lang]}
                 </p>
               </div>
@@ -243,17 +287,17 @@ function CtaSection({ lang }: { lang: Lang }) {
   return (
     <section className="px-6 py-20 md:py-24">
       <div className="shimmer mx-auto max-w-3xl rounded-2xl border border-border px-8 py-14 text-center md:px-16">
-        <h2 className="mb-3 text-3xl font-bold tracking-tight md:text-4xl">
+        <h2 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
           {t.cta.title[lang]}
         </h2>
-        <p className="mx-auto mb-8 max-w-md text-base text-text-secondary">
+        <p className="mx-auto mb-8 max-w-md text-lg text-text-secondary">
           {t.cta.subtitle[lang]}
         </p>
         <a
           href={GITHUB_RELEASE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 rounded-xl bg-ember px-8 py-4 text-lg font-bold text-white shadow-lg shadow-ember/20 transition hover:bg-ember-light hover:shadow-xl hover:shadow-ember/30"
+          className="inline-flex items-center gap-2.5 rounded-xl bg-ember px-9 py-4.5 text-xl font-bold text-white shadow-lg shadow-ember/20 transition hover:bg-ember-light hover:shadow-xl hover:shadow-ember/30"
         >
           <DownloadIcon />
           {t.cta.button[lang]}
@@ -270,8 +314,8 @@ function Footer() {
   return (
     <footer className="border-t border-border px-6 py-8">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 text-sm text-text-secondary">
-        <span className="text-ember font-bold text-base">AFK4AI</span>
-        <div className="flex items-center gap-5 text-xs">
+        <span className="text-ember font-bold text-lg">AFK4AI</span>
+        <div className="flex items-center gap-5 text-sm">
           <a
             href="https://github.com/jojogreen91"
             target="_blank"
@@ -289,7 +333,7 @@ function Footer() {
             iawbg13@gmail.com
           </a>
         </div>
-        <span className="text-[11px] text-text-secondary/50">Made by JoJo Green</span>
+        <span className="text-xs text-text-secondary/50">Made by JoJo Green</span>
       </div>
     </footer>
   );
@@ -305,12 +349,29 @@ function DownloadIcon() {
   );
 }
 
-function LockIcon() {
+function WarningIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-ember">
-      <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2L1 21h22L12 2zm0 4l7.53 13H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-ember">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function TouchIdIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/70">
+      <path d="M12 2a10 10 0 00-7.07 2.93M12 2a10 10 0 017.07 2.93M12 22a10 10 0 007.07-2.93M12 22a10 10 0 01-7.07-2.93" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M12 8a4 4 0 00-4 4v2a4 4 0 008 0v-2a4 4 0 00-4-4z" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M12 12v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   );
 }
