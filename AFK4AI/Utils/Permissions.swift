@@ -15,7 +15,8 @@ enum Permissions {
     }
 
     static func hasAccessibilityPermission() -> Bool {
-        AXIsProcessTrusted()
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: false] as CFDictionary
+        return AXIsProcessTrustedWithOptions(options)
     }
 
     static func openScreenRecordingSettings() {
