@@ -38,6 +38,12 @@ struct LockScreenView: View {
                     .padding(.top, 8)
                     .padding(.bottom, 4)
 
+                // System metrics bar
+                MetricsBarView(
+                    metrics: appState.systemMetrics,
+                    primary: primary
+                )
+
                 // Compact unlock area
                 unlockArea
                     .padding(.bottom, 12)
