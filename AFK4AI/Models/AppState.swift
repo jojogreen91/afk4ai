@@ -9,10 +9,12 @@ class AppState: ObservableObject {
     @Published var capturedImage: NSImage?
     @Published var bannerMessage: String = "AFK4AI"
     @Published var colorTheme: ColorTheme = .ember
+    @Published var systemMetrics = SystemMetrics()
 
     private let windowListService = WindowListService()
     private var windowCaptureService: WindowCaptureService?
     private var inputBlocker: InputBlocker?
+    private var systemMetricsService: SystemMetricsService?
 
     func refreshWindowList() {
         availableWindows = windowListService.getWindowList()
@@ -34,6 +36,10 @@ class AppState: ObservableObject {
         }
         inputBlocker?.startBlocking()
         startStreaming()
+        systemMetricsService = SystemMetricsService()
+        systemMetricsService?.startMonitoring { [weak self] metrics in
+            self?.systemMetrics = metrics
+        }
     }
 
     func attemptUnlock(completion: @escaping (Bool) -> Void) {
@@ -70,6 +76,9 @@ class AppState: ObservableObject {
         stopStreaming()
         inputBlocker?.stopBlocking()
         inputBlocker = nil
+        systemMetricsService?.stopMonitoring()
+        systemMetricsService = nil
+        systemMetrics = SystemMetrics()
         capturedImage = nil
     }
 
