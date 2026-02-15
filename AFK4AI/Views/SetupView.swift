@@ -124,7 +124,7 @@ struct SetupView: View {
                     title: "화면 녹화",
                     description: "선택한 창의 실시간 화면을 캡처합니다",
                     granted: hasScreenPermission,
-                    action: { Permissions.openScreenRecordingSettings() }
+                    action: { Permissions.requestScreenRecordingPermission() }
                 )
 
                 Divider().background(Theme.borderDark)

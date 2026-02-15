@@ -25,6 +25,14 @@ class AppState: ObservableObject {
     }
 
     func startLock() {
+        guard Permissions.hasScreenRecordingPermission() else {
+            print("[AFK4AI] 화면 녹화 권한이 없습니다. 잠금을 시작할 수 없습니다.")
+            return
+        }
+        guard Permissions.hasAccessibilityPermission() else {
+            print("[AFK4AI] 손쉬운 사용 권한이 없습니다. 잠금을 시작할 수 없습니다.")
+            return
+        }
         isLocked = true
         inputBlocker = InputBlocker()
         inputBlocker?.onQuitAttempt = { [weak self] in
