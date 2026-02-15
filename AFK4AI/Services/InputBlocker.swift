@@ -8,7 +8,9 @@ class InputBlocker {
     // Called when user tries Cmd+Q while locked
     var onQuitAttempt: (() -> Void)?
 
-    func startBlocking() {
+    /// Returns true if event tap was created successfully
+    @discardableResult
+    func startBlocking() -> Bool {
         var eventMask: CGEventMask = 0
         eventMask |= (1 << CGEventType.keyDown.rawValue)
         eventMask |= (1 << CGEventType.keyUp.rawValue)
@@ -39,7 +41,7 @@ class InputBlocker {
 
         guard let eventTap = eventTap else {
             print("[AFK4AI] Failed to create event tap. Accessibility permission required.")
-            return
+            return false
         }
 
         runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
@@ -47,6 +49,7 @@ class InputBlocker {
             CFRunLoopAddSource(CFRunLoopGetCurrent(), source, .commonModes)
         }
         CGEvent.tapEnable(tap: eventTap, enable: true)
+        return true
     }
 
     private func handleEvent(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
