@@ -232,25 +232,27 @@ struct LockScreenView: View {
 
     private func enterFullScreen() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            if let window = NSApplication.shared.windows.first {
-                window.toggleFullScreen(nil)
-                window.level = .screenSaver
-                window.collectionBehavior = [.fullScreenPrimary, .canJoinAllSpaces]
-                window.styleMask.remove(.closable)
-                window.styleMask.remove(.miniaturizable)
-            }
+            guard let window = NSApp.keyWindow ?? NSApplication.shared.windows.first(where: { $0.isVisible && !$0.className.contains("StatusBar") }),
+                  let screen = window.screen ?? NSScreen.main else { return }
+
+            // Don't use toggleFullScreen — it creates a new Space,
+            // isolating the target window and breaking screen capture.
+            window.styleMask = [.borderless]
+            window.level = .screenSaver
+            window.collectionBehavior = [.canJoinAllSpaces, .stationary]
+            window.setFrame(screen.frame, display: true)
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
         }
     }
 
     private func exitFullScreen() {
-        if let window = NSApplication.shared.windows.first {
-            window.level = .normal
-            window.collectionBehavior = [.fullScreenPrimary]
-            window.styleMask.insert(.closable)
-            window.styleMask.insert(.miniaturizable)
-            if window.styleMask.contains(.fullScreen) {
-                window.toggleFullScreen(nil)
-            }
-        }
+        guard let window = NSApp.keyWindow ?? NSApplication.shared.windows.first(where: { $0.isVisible && !$0.className.contains("StatusBar") }) else { return }
+
+        window.level = .normal
+        window.collectionBehavior = []
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.setFrame(NSRect(x: 200, y: 200, width: 540, height: 740), display: true)
+        window.center()
     }
 }
