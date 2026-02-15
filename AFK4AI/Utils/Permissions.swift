@@ -62,11 +62,19 @@ enum Permissions {
         }
     }
 
+    /// Reset stale TCC entry and re-request accessibility permission.
+    /// Ad-hoc signed apps get a new code hash on every rebuild, so the old
+    /// TCC entry becomes stale (shows ON in System Settings but doesn't work).
     static func requestAccessibilityPermission() {
+        // Reset stale TCC entries for our bundle ID so macOS re-evaluates
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+        process.arguments = ["reset", "Accessibility", Bundle.main.bundleIdentifier ?? "com.afk4ai.AFK4AI"]
+        try? process.run()
+        process.waitUntilExit()
+
+        // Now request fresh permission - this will show the system prompt
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
-        // Also open settings directly in case the prompt doesn't appear
-        // (can happen when Input Monitoring is granted but not Accessibility)
-        openAccessibilitySettings()
     }
 }
