@@ -214,12 +214,14 @@ struct LockScreenView: View {
             window.setFrame(screen.frame, display: true)
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
+            NSApp.presentationOptions = [.hideDock, .hideMenuBar]
         }
     }
 
     private func exitFullScreen() {
         guard let window = NSApp.keyWindow ?? NSApplication.shared.windows.first(where: { $0.isVisible && !$0.className.contains("StatusBar") }) else { return }
 
+        NSApp.presentationOptions = []
         window.level = .normal
         window.collectionBehavior = []
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
