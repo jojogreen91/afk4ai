@@ -102,10 +102,14 @@ class InputBlocker {
             return nil
         }
 
-        // Block all mouse events
-        if type == .leftMouseDown || type == .leftMouseUp ||
-           type == .rightMouseDown || type == .rightMouseUp ||
-           type == .mouseMoved || type == .scrollWheel {
+        // Allow left mouse & mouse movement for UI interaction
+        // (screenSaver-level fullscreen window captures all clicks)
+        if type == .leftMouseDown || type == .leftMouseUp || type == .mouseMoved {
+            return Unmanaged.passRetained(event)
+        }
+
+        // Block right mouse and scroll
+        if type == .rightMouseDown || type == .rightMouseUp || type == .scrollWheel {
             return nil
         }
 
