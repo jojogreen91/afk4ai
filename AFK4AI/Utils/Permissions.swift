@@ -25,7 +25,25 @@ enum Permissions {
 
     static func hasAccessibilityPermission() -> Bool {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: false] as CFDictionary
-        return AXIsProcessTrustedWithOptions(options)
+        if AXIsProcessTrustedWithOptions(options) {
+            return true
+        }
+        // Fallback: AXIsProcessTrusted can return stale false on ad-hoc signed apps
+        // after rebuild (DerivedData path changes). Try creating a minimal event tap
+        // to verify actual permission.
+        let testTap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap,
+            place: .headInsertEventTap,
+            options: .listenOnly,
+            eventsOfInterest: CGEventMask(1 << CGEventType.flagsChanged.rawValue),
+            callback: { _, _, event, _ in Unmanaged.passRetained(event) },
+            userInfo: nil
+        )
+        if let tap = testTap {
+            CFMachPortInvalidate(tap)
+            return true
+        }
+        return false
     }
 
     static func requestScreenRecordingPermission() {
@@ -47,5 +65,8 @@ enum Permissions {
     static func requestAccessibilityPermission() {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
+        // Also open settings directly in case the prompt doesn't appear
+        // (can happen when Input Monitoring is granted but not Accessibility)
+        openAccessibilitySettings()
     }
 }
