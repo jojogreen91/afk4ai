@@ -3,12 +3,15 @@ import AppKit
 import ScreenCaptureKit
 import CoreMedia
 
-class WindowCaptureService: NSObject, SCStreamOutput {
+class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
     private let windowID: CGWindowID
     private var stream: SCStream?
     private var onFrame: ((NSImage) -> Void)?
     private var fallbackTimer: Timer?
     private var streamStarted = false
+    private var scFrameReceived = false
+    private var watchdogTimer: Timer?
+    private let ciContext = CIContext()
 
     init(windowID: CGWindowID) {
         self.windowID = windowID
@@ -27,7 +30,7 @@ class WindowCaptureService: NSObject, SCStreamOutput {
                 let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
 
                 guard let window = content.windows.first(where: { $0.windowID == windowID }) else {
-                    print("[AFK4AI] Target window not found (ID: \(windowID))")
+                    print("[AFK4AI] Target window not found (ID: \(windowID)). Fallback capture active.")
                     return
                 }
 
@@ -41,15 +44,16 @@ class WindowCaptureService: NSObject, SCStreamOutput {
                 config.pixelFormat = kCVPixelFormatType_32BGRA
                 config.queueDepth = 3
 
-                let newStream = SCStream(filter: filter, configuration: config, delegate: nil)
+                let newStream = SCStream(filter: filter, configuration: config, delegate: self)
                 try newStream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .global(qos: .userInteractive))
                 try await newStream.startCapture()
 
                 self.stream = newStream
                 self.streamStarted = true
 
+                // Don't stop fallback yet — wait until SCStream actually delivers frames
                 await MainActor.run {
-                    self.stopFallbackCapture()
+                    self.startWatchdog()
                 }
             } catch {
                 print("[AFK4AI] SCStream failed: \(error). Fallback capture active.")
@@ -59,6 +63,7 @@ class WindowCaptureService: NSObject, SCStreamOutput {
 
     func stopStreaming() {
         stopFallbackCapture()
+        stopWatchdog()
         guard let stream = stream else {
             self.onFrame = nil
             return
@@ -69,6 +74,24 @@ class WindowCaptureService: NSObject, SCStreamOutput {
         self.stream = nil
         self.onFrame = nil
         self.streamStarted = false
+        self.scFrameReceived = false
+    }
+
+    // MARK: - Watchdog (detect SCStream not delivering frames)
+
+    private func startWatchdog() {
+        watchdogTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
+            guard let self = self else { return }
+            if !self.scFrameReceived {
+                print("[AFK4AI] SCStream watchdog: no frames after 3s, keeping fallback active.")
+                self.streamStarted = false
+            }
+        }
+    }
+
+    private func stopWatchdog() {
+        watchdogTimer?.invalidate()
+        watchdogTimer = nil
     }
 
     // MARK: - Fallback (legacy timer-based capture)
@@ -87,7 +110,14 @@ class WindowCaptureService: NSObject, SCStreamOutput {
 
     private func captureLegacy() {
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            guard let self = self, !self.streamStarted else { return }
+            guard let self = self else { return }
+            // Once SCStream delivers real frames, stop legacy capture
+            guard !self.scFrameReceived else {
+                DispatchQueue.main.async {
+                    self.stopFallbackCapture()
+                }
+                return
+            }
             guard let cgImage = CGWindowListCreateImage(
                 .null,
                 .optionIncludingWindow,
@@ -108,13 +138,31 @@ class WindowCaptureService: NSObject, SCStreamOutput {
         guard type == .screen, let imageBuffer = sampleBuffer.imageBuffer else { return }
 
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-        let context = CIContext()
         let rect = CGRect(x: 0, y: 0, width: CVPixelBufferGetWidth(imageBuffer), height: CVPixelBufferGetHeight(imageBuffer))
-        guard let cgImage = context.createCGImage(ciImage, from: rect) else { return }
+        guard let cgImage = ciContext.createCGImage(ciImage, from: rect) else { return }
 
         let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width / 2, height: cgImage.height / 2))
         DispatchQueue.main.async { [weak self] in
-            self?.onFrame?(nsImage)
+            guard let self = self else { return }
+            if !self.scFrameReceived {
+                self.scFrameReceived = true
+                self.stopWatchdog()
+                print("[AFK4AI] SCStream delivering frames, stopping fallback.")
+            }
+            self.onFrame?(nsImage)
+        }
+    }
+
+    // MARK: - SCStreamDelegate
+
+    func stream(_ stream: SCStream, didStopWithError error: Error) {
+        print("[AFK4AI] SCStream stopped with error: \(error). Restarting fallback.")
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.stream = nil
+            self.streamStarted = false
+            self.scFrameReceived = false
+            self.startFallbackCapture()
         }
     }
 
