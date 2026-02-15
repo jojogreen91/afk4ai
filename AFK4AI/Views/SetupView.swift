@@ -48,6 +48,9 @@ struct SetupView: View {
         .onAppear {
             appState.refreshWindowList()
             checkPermissions()
+            // Pre-trigger ScreenCaptureKit permission so the dialog
+            // appears here in setup, not during lock activation.
+            Permissions.preauthorizeScreenCapture()
             permissionTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
                 checkPermissions()
             }
