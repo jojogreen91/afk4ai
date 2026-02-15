@@ -105,10 +105,7 @@ class AppState: ObservableObject {
 
     private func startStreaming() {
         guard let window = selectedWindow else { return }
-        windowCaptureService = WindowCaptureService(
-            windowID: window.windowID,
-            cachedContent: Permissions.cachedShareableContent
-        )
+        windowCaptureService = WindowCaptureService(windowID: window.windowID)
         windowCaptureService?.startStreaming { [weak self] image in
             self?.capturedImage = image
         }
