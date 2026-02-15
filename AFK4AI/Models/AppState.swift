@@ -68,8 +68,12 @@ class AppState: ObservableObject {
             return
         }
 
-        // Temporarily stop blocking so the system auth dialog can receive input
+        // 1. Stop input blocking so the system auth dialog can receive input
         inputBlocker?.stopBlocking()
+
+        // 2. Lower window level so the auth dialog is visible above the lock screen
+        let window = NSApplication.shared.windows.first
+        window?.level = .normal
 
         context.evaluatePolicy(
             .deviceOwnerAuthentication,
@@ -79,7 +83,8 @@ class AppState: ObservableObject {
                 if success {
                     self?.stopLock()
                 } else {
-                    // Re-enable blocking if auth failed
+                    // Restore lock state: raise window level and re-enable blocking
+                    window?.level = .screenSaver
                     self?.inputBlocker?.startBlocking()
                 }
                 completion(success)
