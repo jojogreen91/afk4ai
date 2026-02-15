@@ -8,6 +8,7 @@ struct SetupView: View {
 
     private var primary: Color { appState.colorTheme.primary }
     private var status: Color { appState.colorTheme.statusColor }
+    private var bannerText: Color { appState.colorTheme.bannerTextColor }
     private var allPermissionsGranted: Bool { hasScreenPermission && hasAccessibilityPermission }
 
     var body: some View {
@@ -31,21 +32,19 @@ struct SetupView: View {
                     .padding(.top, 28)
                     .padding(.bottom, 20)
 
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        permissionsSection
-                        targetWindowSection
-                        themeSection
-                    }
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 110)
+                VStack(spacing: 20) {
+                    permissionsSection
+                    targetWindowSection
+                    themeSection
                 }
+                .padding(.horizontal, 28)
 
                 Spacer(minLength: 0)
                 activateButton
             }
         }
-        .frame(width: 540, height: 620)
+        .frame(width: 540, height: 740)
+        .preferredColorScheme(.dark)
         .onAppear {
             appState.refreshWindowList()
             checkPermissions()
@@ -75,7 +74,7 @@ struct SetupView: View {
                         .shadow(color: primary.opacity(0.3), radius: 12)
                     Image(systemName: "lock.shield.fill")
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(bannerText)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 0) {
@@ -174,7 +173,7 @@ struct SetupView: View {
                     action()
                 }
                 .font(Theme.display(12, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundColor(bannerText)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 6)
                 .background(primary)
