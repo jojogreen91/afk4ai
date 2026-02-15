@@ -71,7 +71,8 @@ struct MenuBarView: View {
             }
         } else {
             Button {
-                if appState.selectedWindow != nil {
+                let hasPermissions = Permissions.hasScreenRecordingPermission() && Permissions.hasAccessibilityPermission()
+                if appState.selectedWindow != nil && hasPermissions {
                     appState.startLock()
                 } else {
                     openWindow(id: "settings")

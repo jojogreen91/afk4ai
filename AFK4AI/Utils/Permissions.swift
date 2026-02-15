@@ -1,21 +1,18 @@
 import Foundation
 import CoreGraphics
 import AppKit
-import ScreenCaptureKit
 
 enum Permissions {
     static func hasScreenRecordingPermission() -> Bool {
-        let testImage = CGWindowListCreateImage(
-            CGRect(x: 0, y: 0, width: 1, height: 1),
-            .optionOnScreenOnly,
-            kCGNullWindowID,
-            []
-        )
-        return testImage != nil
+        CGPreflightScreenCaptureAccess()
     }
 
     static func hasAccessibilityPermission() -> Bool {
         AXIsProcessTrusted()
+    }
+
+    static func requestScreenRecordingPermission() {
+        CGRequestScreenCaptureAccess()
     }
 
     static func openScreenRecordingSettings() {
