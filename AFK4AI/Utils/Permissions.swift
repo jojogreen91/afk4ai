@@ -4,6 +4,9 @@ import AppKit
 import ScreenCaptureKit
 
 enum Permissions {
+    /// Cached SCShareableContent from preauthorization.
+    /// Used by WindowCaptureService to avoid triggering a new permission dialog during lock activation.
+    static var cachedShareableContent: SCShareableContent?
     static func hasScreenRecordingPermission() -> Bool {
         // CGPreflightScreenCaptureAccess can return stale results on some macOS versions
         if CGPreflightScreenCaptureAccess() {
@@ -52,9 +55,34 @@ enum Permissions {
     /// in the setup screen, not during lock activation.
     /// Ad-hoc signed apps get a new code hash on every rebuild,
     /// so the dialog reappears after each build.
+    /// Caches the result so WindowCaptureService can reuse it without
+    /// triggering another dialog.
     static func preauthorizeScreenCapture() {
         Task {
-            _ = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+            do {
+                let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+                await MainActor.run {
+                    cachedShareableContent = content
+                }
+                print("[AFK4AI] Screen capture preauthorized, \(content.windows.count) windows cached.")
+            } catch {
+                print("[AFK4AI] Preauthorize failed: \(error)")
+            }
+        }
+    }
+
+    /// Refresh cached SCShareableContent. Since permission was already granted
+    /// during preauthorization, this should NOT trigger a permission dialog.
+    static func refreshCachedContent() async -> SCShareableContent? {
+        do {
+            let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+            await MainActor.run {
+                cachedShareableContent = content
+            }
+            return content
+        } catch {
+            print("[AFK4AI] refreshCachedContent failed: \(error)")
+            return cachedShareableContent
         }
     }
 

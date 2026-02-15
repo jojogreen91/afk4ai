@@ -5,15 +5,18 @@ import CoreMedia
 
 class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
     private let windowID: CGWindowID
+    private let cachedContent: SCShareableContent?
     private var stream: SCStream?
     private var onFrame: ((NSImage) -> Void)?
     private var fallbackTimer: Timer?
     private var scFrameReceived = false
+    private var fallbackFrameCount = 0
     private var watchdogTimer: Timer?
     private let ciContext = CIContext()
 
-    init(windowID: CGWindowID) {
+    init(windowID: CGWindowID, cachedContent: SCShareableContent? = nil) {
         self.windowID = windowID
+        self.cachedContent = cachedContent
         super.init()
     }
 
@@ -38,15 +41,35 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
         stream = nil
         onFrame = nil
         scFrameReceived = false
+        fallbackFrameCount = 0
     }
 
     // MARK: - SCStream
 
     private func startSCStream() async {
         do {
-            let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+            // Use cached content to avoid triggering a new permission dialog.
+            // The permission dialog was already shown during setup (preauthorize).
+            let content: SCShareableContent
+            if let cached = cachedContent {
+                print("[AFK4AI] Using cached SCShareableContent (\(cached.windows.count) windows).")
+                content = cached
+            } else {
+                print("[AFK4AI] No cached content, fetching fresh SCShareableContent...")
+                content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+            }
 
-            guard let window = content.windows.first(where: { $0.windowID == windowID }) else {
+            var targetWindow = content.windows.first(where: { $0.windowID == windowID })
+
+            // If window not found in cache, try a fresh fetch
+            if targetWindow == nil, cachedContent != nil {
+                print("[AFK4AI] Window ID \(windowID) not in cache, refreshing...")
+                if let fresh = await Permissions.refreshCachedContent() {
+                    targetWindow = fresh.windows.first(where: { $0.windowID == windowID })
+                }
+            }
+
+            guard let window = targetWindow else {
                 print("[AFK4AI] Target window not found in SCShareableContent (ID: \(windowID)).")
                 return
             }
@@ -66,6 +89,7 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
             try await newStream.startCapture()
 
             self.stream = newStream
+            print("[AFK4AI] SCStream started successfully for window ID \(windowID).")
 
             await MainActor.run {
                 self.startWatchdog()
@@ -117,10 +141,19 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
                 .optionIncludingWindow,
                 self.windowID,
                 [.boundsIgnoreFraming, .nominalResolution]
-            ) else { return }
+            ) else {
+                if self.fallbackFrameCount == 0 {
+                    print("[AFK4AI] CGWindowListCreateImage returned nil for window \(self.windowID). Permission may not be granted yet.")
+                }
+                return
+            }
 
             let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
             DispatchQueue.main.async {
+                self.fallbackFrameCount += 1
+                if self.fallbackFrameCount == 1 {
+                    print("[AFK4AI] Fallback capture delivering frames for window \(self.windowID).")
+                }
                 self.onFrame?(nsImage)
             }
         }
