@@ -65,7 +65,7 @@ struct LockScreenView: View {
 
     private var marqueeBanner: some View {
         MarqueeBanner(text: "AFK4AI", textColor: bannerText)
-            .frame(height: 44)
+            .frame(height: 56)
             .background(primary)
             .shadow(color: primary.opacity(0.3), radius: 15, y: 3)
     }

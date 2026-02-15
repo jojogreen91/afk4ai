@@ -120,13 +120,14 @@ struct MarqueeBanner: View {
                 : 0
             let currentOffset = progress - (unitWidth > 0 ? unitWidth : 0)
 
-            GeometryReader { _ in
+            GeometryReader { geo in
                 HStack(spacing: 0) {
                     ForEach(0..<20, id: \.self) { _ in
                         unitContent
                     }
                 }
                 .fixedSize(horizontal: true, vertical: false)
+                .frame(height: geo.size.height)
                 .offset(x: currentOffset)
             }
             .clipped()
@@ -145,14 +146,14 @@ struct MarqueeBanner: View {
     }
 
     private var unitContent: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
             Text(text)
-                .font(Theme.display(18, weight: .black))
-                .tracking(2)
+                .font(Theme.display(24, weight: .black))
+                .tracking(3)
         }
         .foregroundColor(textColor)
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
     }
 }
