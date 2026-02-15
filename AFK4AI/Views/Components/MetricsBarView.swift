@@ -44,28 +44,28 @@ struct MetricsBarView: View {
                 color: primary
             )
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
-        .background(Color.black.opacity(0.4))
+        .padding(.horizontal, 24)
+        .padding(.vertical, 14)
+        .background(Color.black.opacity(0.5))
         .overlay(
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(primary.opacity(0.15)),
+                .foregroundColor(primary.opacity(0.2)),
             alignment: .top
         )
         .overlay(
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(primary.opacity(0.15)),
+                .foregroundColor(primary.opacity(0.2)),
             alignment: .bottom
         )
     }
 
     private var metricDivider: some View {
         Rectangle()
-            .fill(primary.opacity(0.1))
-            .frame(width: 1, height: 20)
-            .padding(.horizontal, 12)
+            .fill(primary.opacity(0.15))
+            .frame(width: 1, height: 30)
+            .padding(.horizontal, 16)
     }
 }
 
@@ -79,31 +79,31 @@ private struct MetricGaugeView: View {
     let color: Color
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(color.opacity(0.6))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(color.opacity(0.7))
 
             Text(label)
-                .font(Theme.mono(9, weight: .bold))
-                .foregroundColor(color.opacity(0.5))
+                .font(Theme.mono(13, weight: .bold))
+                .foregroundColor(color.opacity(0.6))
 
-            // Mini progress bar
+            // Progress bar
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 1.5)
+                    RoundedRectangle(cornerRadius: 2.5)
                         .fill(color.opacity(0.15))
 
-                    RoundedRectangle(cornerRadius: 1.5)
+                    RoundedRectangle(cornerRadius: 2.5)
                         .fill(color.opacity(0.7))
                         .frame(width: geo.size.width * min(CGFloat(value) / 100.0, 1.0))
                 }
             }
-            .frame(width: 40, height: 3)
+            .frame(width: 80, height: 5)
 
             Text(displayText)
-                .font(Theme.mono(10, weight: .medium))
-                .foregroundColor(.white.opacity(0.6))
+                .font(Theme.mono(15, weight: .medium))
+                .foregroundColor(.white.opacity(0.7))
         }
     }
 }
@@ -116,31 +116,31 @@ private struct NetworkMetricView: View {
     let color: Color
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(systemName: "network")
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(color.opacity(0.6))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(color.opacity(0.7))
 
             Text("NET")
-                .font(Theme.mono(9, weight: .bold))
-                .foregroundColor(color.opacity(0.5))
+                .font(Theme.mono(13, weight: .bold))
+                .foregroundColor(color.opacity(0.6))
 
-            HStack(spacing: 4) {
+            HStack(spacing: 5) {
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 7, weight: .bold))
-                    .foregroundColor(color.opacity(0.5))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(color.opacity(0.6))
                 Text(SystemMetrics.formatSpeed(upSpeed))
-                    .font(Theme.mono(9, weight: .medium))
-                    .foregroundColor(.white.opacity(0.6))
+                    .font(Theme.mono(13, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
             }
 
-            HStack(spacing: 4) {
+            HStack(spacing: 5) {
                 Image(systemName: "arrow.down")
-                    .font(.system(size: 7, weight: .bold))
-                    .foregroundColor(color.opacity(0.5))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(color.opacity(0.6))
                 Text(SystemMetrics.formatSpeed(downSpeed))
-                    .font(Theme.mono(9, weight: .medium))
-                    .foregroundColor(.white.opacity(0.6))
+                    .font(Theme.mono(13, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
             }
         }
     }

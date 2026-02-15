@@ -100,3 +100,59 @@ struct SectionHeader: View {
         }
     }
 }
+
+// MARK: - Marquee Banner
+
+struct MarqueeBanner: View {
+    var text: String = "AFK4AI"
+    var textColor: Color
+    var speed: CGFloat = 40
+
+    @State private var unitWidth: CGFloat = 0
+    @State private var startDate: Date = .now
+
+    var body: some View {
+        TimelineView(.animation) { context in
+            let elapsed = context.date.timeIntervalSince(startDate)
+            let totalOffset = CGFloat(elapsed) * speed
+            let progress = unitWidth > 0
+                ? totalOffset.truncatingRemainder(dividingBy: unitWidth)
+                : 0
+            let currentOffset = progress - (unitWidth > 0 ? unitWidth : 0)
+
+            GeometryReader { _ in
+                HStack(spacing: 0) {
+                    ForEach(0..<20, id: \.self) { _ in
+                        unitContent
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                .offset(x: currentOffset)
+            }
+            .clipped()
+        }
+        .background(
+            unitContent
+                .fixedSize()
+                .hidden()
+                .background(GeometryReader { g in
+                    Color.clear.onAppear {
+                        let w = g.size.width
+                        if w > 0 { unitWidth = w }
+                    }
+                })
+        )
+    }
+
+    private var unitContent: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 14, weight: .bold))
+            Text(text)
+                .font(Theme.display(18, weight: .black))
+                .tracking(2)
+        }
+        .foregroundColor(textColor)
+        .padding(.horizontal, 14)
+    }
+}

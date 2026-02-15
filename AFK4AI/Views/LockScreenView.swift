@@ -29,20 +29,20 @@ struct LockScreenView: View {
                 .offset(x: 250, y: 200)
 
             VStack(spacing: 0) {
-                // Compact banner with elapsed time
+                // Marquee banner
                 bannerWithTime
+
+                // System metrics bar (top, prominent)
+                MetricsBarView(
+                    metrics: appState.systemMetrics,
+                    primary: primary
+                )
 
                 // Stream area takes maximum space
                 streamArea
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
                     .padding(.bottom, 4)
-
-                // System metrics bar
-                MetricsBarView(
-                    metrics: appState.systemMetrics,
-                    primary: primary
-                )
 
                 // Compact unlock area
                 unlockArea
@@ -63,34 +63,30 @@ struct LockScreenView: View {
     // MARK: - Banner with Elapsed Time (compact)
 
     private var bannerWithTime: some View {
-        HStack(spacing: 0) {
-            HazardPattern(color: primary, width: 50)
-                .opacity(0.8)
+        ZStack {
+            // Scrolling marquee background
+            MarqueeBanner(text: "AFK4AI", textColor: bannerText)
 
+            // Elapsed time overlay (right side)
             HStack {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(bannerText)
-
-                Text(appState.bannerMessage)
-                    .font(Theme.display(20, weight: .bold))
-                    .foregroundColor(bannerText)
-                    .textCase(.uppercase)
-
                 Spacer()
 
-                // Elapsed time inline
                 HStack(spacing: 6) {
-                    GlowDot(color: bannerText.opacity(0.6), size: 5, animate: true)
+                    GlowDot(color: bannerText, size: 5, animate: true)
                     Text(formattedElapsed)
-                        .font(Theme.mono(14, weight: .bold))
-                        .foregroundColor(bannerText.opacity(0.8))
+                        .font(Theme.mono(13, weight: .bold))
+                        .foregroundColor(bannerText)
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 5)
+                .background(primary)
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule()
+                        .stroke(bannerText.opacity(0.2), lineWidth: 1)
+                )
+                .padding(.trailing, 12)
             }
-            .padding(.horizontal, 16)
-
-            HazardPattern(color: primary, width: 50)
-                .opacity(0.8)
         }
         .frame(height: 44)
         .background(primary)
