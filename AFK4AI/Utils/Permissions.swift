@@ -24,17 +24,13 @@ enum Permissions {
     }
 
     static func hasAccessibilityPermission() -> Bool {
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: false] as CFDictionary
-        if AXIsProcessTrustedWithOptions(options) {
-            return true
-        }
-        // Fallback: AXIsProcessTrusted can return stale false on ad-hoc signed apps
-        // after rebuild (DerivedData path changes). Try creating a minimal event tap
-        // to verify actual permission.
+        // Don't rely on AXIsProcessTrusted alone - it returns stale results
+        // with ad-hoc signed apps. Instead, try creating the actual event tap
+        // (same type InputBlocker uses) as the ground truth test.
         let testTap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
-            options: .listenOnly,
+            options: .defaultTap,
             eventsOfInterest: CGEventMask(1 << CGEventType.flagsChanged.rawValue),
             callback: { _, _, event, _ in Unmanaged.passRetained(event) },
             userInfo: nil
@@ -43,7 +39,8 @@ enum Permissions {
             CFMachPortInvalidate(tap)
             return true
         }
-        return false
+        // Also check AXIsProcessTrusted as a secondary signal
+        return AXIsProcessTrusted()
     }
 
     static func requestScreenRecordingPermission() {

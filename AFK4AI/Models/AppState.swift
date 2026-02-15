@@ -10,6 +10,7 @@ class AppState: ObservableObject {
     @Published var bannerMessage: String = "AFK4AI"
     @Published var colorTheme: ColorTheme = .ember
     @Published var systemMetrics = SystemMetrics()
+    @Published var lockError: String?
 
     private let windowListService = WindowListService()
     private var windowCaptureService: WindowCaptureService?
@@ -26,23 +27,30 @@ class AppState: ObservableObject {
 
     func startLock() {
         guard Permissions.hasScreenRecordingPermission() else {
-            print("[AFK4AI] 화면 녹화 권한이 없습니다. 잠금을 시작할 수 없습니다.")
+            lockError = "화면 녹화 권한이 필요합니다"
             return
         }
-        guard Permissions.hasAccessibilityPermission() else {
-            print("[AFK4AI] 손쉬운 사용 권한이 없습니다. 잠금을 시작할 수 없습니다.")
-            return
-        }
-        isLocked = true
-        inputBlocker = InputBlocker()
-        inputBlocker?.onQuitAttempt = { [weak self] in
+
+        lockError = nil
+
+        // Try to create InputBlocker and verify event tap actually works
+        let blocker = InputBlocker()
+        blocker.onQuitAttempt = { [weak self] in
             self?.attemptUnlock { success in
                 if success {
                     NSApp.terminate(nil)
                 }
             }
         }
-        inputBlocker?.startBlocking()
+        let blockingStarted = blocker.startBlocking()
+        if !blockingStarted {
+            lockError = "입력 차단을 시작할 수 없습니다. 시스템 설정 > 개인정보 보호 및 보안 > 손쉬운 사용에서 AFK4AI를 제거 후 다시 추가해주세요."
+            blocker.stopBlocking()
+            return
+        }
+
+        isLocked = true
+        inputBlocker = blocker
         startStreaming()
         systemMetricsService = SystemMetricsService()
         systemMetricsService?.startMonitoring { [weak self] metrics in

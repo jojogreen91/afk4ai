@@ -301,10 +301,16 @@ struct SetupView: View {
                 )
             }
             .buttonStyle(.plain)
-            .disabled(appState.selectedWindow == nil || !allPermissionsGranted)
-            .opacity(appState.selectedWindow == nil || !allPermissionsGranted ? 0.35 : 1.0)
+            .disabled(appState.selectedWindow == nil || !hasScreenPermission)
+            .opacity(appState.selectedWindow == nil || !hasScreenPermission ? 0.35 : 1.0)
 
-            if !allPermissionsGranted {
+            if let error = appState.lockError {
+                Text(error)
+                    .font(Theme.display(10, weight: .medium))
+                    .foregroundColor(.red.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 8)
+            } else if !allPermissionsGranted {
                 Text("위 권한을 먼저 허용해주세요")
                     .font(Theme.display(10, weight: .medium))
                     .foregroundColor(.yellow.opacity(0.5))
