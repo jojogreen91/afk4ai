@@ -18,6 +18,8 @@
     <string>AFK4AI</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
+    <key>LSUIElement</key>
+    <true/>
     <key>NSScreenCaptureUsageDescription</key>
     <string>AFK4AI needs screen recording permission to capture and display the selected window in real-time on the lock screen.</string>
     <key>NSAppleEventsUsageDescription</key>
