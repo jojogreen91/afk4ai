@@ -3,7 +3,7 @@ import CoreGraphics
 
 class WindowListService {
     func getWindowList() -> [WindowInfo] {
-        guard let windowList = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
+        guard let windowList = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
             return []
         }
 

@@ -45,7 +45,7 @@ struct MetricsBarView: View {
                 metricDivider
 
                 MetricGaugeView(
-                    icon: "gpu",
+                    icon: "display",
                     label: "GPU",
                     value: metrics.gpuUsage,
                     displayText: metrics.gpuPercent,

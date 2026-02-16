@@ -23,8 +23,8 @@ enum ColorTheme: String, CaseIterable, Identifiable {
         switch self {
         case .ember:  return Color(hex: 0xFF4D00)
         case .mono:   return Color(hex: 0xFFFFFF)
-        case .ocean:  return Color(hex: 0x3B82F6)
-        case .matrix: return Color(hex: 0x22C55E)
+        case .ocean:  return Color(hex: 0x2563EB)
+        case .matrix: return Color(hex: 0x16A34A)
         }
     }
 
@@ -32,8 +32,8 @@ enum ColorTheme: String, CaseIterable, Identifiable {
         switch self {
         case .ember:  return Color(hex: 0x00FF41)
         case .mono:   return Color(hex: 0xAAAAAA)
-        case .ocean:  return Color(hex: 0x22D3EE)
-        case .matrix: return Color(hex: 0x00FF41)
+        case .ocean:  return Color(hex: 0x0891B2)
+        case .matrix: return Color(hex: 0x00D946)
         }
     }
 
@@ -52,8 +52,8 @@ enum ColorTheme: String, CaseIterable, Identifiable {
         switch self {
         case .ember:  return [Color(hex: 0xFF4D00), Color(hex: 0xFF6B2B)]
         case .mono:   return [Color(hex: 0xFFFFFF), Color(hex: 0x888888)]
-        case .ocean:  return [Color(hex: 0x3B82F6), Color(hex: 0x60A5FA)]
-        case .matrix: return [Color(hex: 0x22C55E), Color(hex: 0x4ADE80)]
+        case .ocean:  return [Color(hex: 0x2563EB), Color(hex: 0x3B82F6)]
+        case .matrix: return [Color(hex: 0x16A34A), Color(hex: 0x22C55E)]
         }
     }
 }

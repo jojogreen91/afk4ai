@@ -28,6 +28,7 @@ struct SetupView: View {
                 .padding(.horizontal, 32)
 
                 Spacer(minLength: 0)
+                    .frame(maxHeight: 32)
                 activateButton
             }
         }
