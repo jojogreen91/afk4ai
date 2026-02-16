@@ -11,6 +11,7 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
     private var onError: ((String) -> Void)?
     private let ciContext = CIContext()
     private var frameCount = 0
+    private var callbackCount = 0
 
     init(windowID: CGWindowID, language: Language) {
         self.windowID = windowID
@@ -25,7 +26,9 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
 
         Task {
             do {
+                print("[Capture] Querying SCShareableContent...")
                 let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+                print("[Capture] SCShareableContent: \(content.windows.count) windows found")
 
                 guard let scWindow = content.windows.first(where: { $0.windowID == self.windowID }) else {
                     let msg = self.l.errorWindowNotFound(id: self.windowID)
@@ -34,18 +37,23 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
                     return
                 }
 
-                print("[Capture] Found window: \(scWindow.owningApplication?.applicationName ?? "?") - \(scWindow.title ?? "?")")
+                let appName = scWindow.owningApplication?.applicationName ?? "?"
+                let title = scWindow.title ?? "?"
+                print("[Capture] Found window: \(appName) - \(title) frame=\(scWindow.frame)")
 
                 let filter = SCContentFilter(desktopIndependentWindow: scWindow)
                 let config = SCStreamConfiguration()
 
                 // Retina display support
-                let scaleFactor = NSScreen.main?.backingScaleFactor ?? 2.0
+                let scaleFactor = await MainActor.run { NSScreen.main?.backingScaleFactor ?? 2.0 }
                 config.width = Int(CGFloat(scWindow.frame.width) * scaleFactor)
                 config.height = Int(CGFloat(scWindow.frame.height) * scaleFactor)
                 config.minimumFrameInterval = CMTime(value: 1, timescale: 10) // 10 FPS
                 config.showsCursor = false
                 config.pixelFormat = kCVPixelFormatType_32BGRA
+                config.queueDepth = 5
+
+                print("[Capture] Config: \(config.width)x\(config.height) scale=\(scaleFactor)")
 
                 let stream = SCStream(filter: filter, configuration: config, delegate: self)
                 try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .global(qos: .userInteractive))
@@ -53,6 +61,14 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
 
                 self.stream = stream
                 print("[Capture] SCStream started successfully")
+
+                // 5초 후 프레임 못 받으면 에러 표시
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+                if self.frameCount == 0 && self.stream != nil {
+                    print("[Capture] WARNING: No frames received after 5s, callbackCount=\(self.callbackCount)")
+                    let msg = self.l.errorCaptureStart("No frames received")
+                    await MainActor.run { self.onError?(msg) }
+                }
             } catch {
                 let msg = self.l.errorCaptureStart(error.localizedDescription)
                 print("[Capture] ERROR: \(msg)")
@@ -64,11 +80,33 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
     // MARK: - SCStreamOutput
 
     func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
+        callbackCount += 1
+
         guard type == .screen else { return }
-        guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
+
+        // 프레임 상태 확인
+        if let attachments = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, createIfNecessary: false) as? [NSDictionary],
+           let attachment = attachments.first,
+           let statusRaw = attachment[SCStreamFrameInfo.status] as? Int {
+            if callbackCount <= 5 {
+                print("[Capture] Callback #\(callbackCount): status=\(statusRaw) hasImage=\(sampleBuffer.imageBuffer != nil)")
+            }
+            // status 0=complete, 1=idle, 2=blank, 3=suspended, 4=started
+            guard statusRaw == 0 else { return }
+        }
+
+        guard let pixelBuffer = sampleBuffer.imageBuffer else {
+            if callbackCount <= 5 {
+                print("[Capture] Callback #\(callbackCount): imageBuffer is nil")
+            }
+            return
+        }
 
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return }
+        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else {
+            print("[Capture] Failed to create CGImage from CIImage")
+            return
+        }
 
         let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
 

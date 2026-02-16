@@ -119,48 +119,48 @@ function HeroSection({ lang }: { lang: Lang }) {
           </div>
 
           {/* Metrics Bar */}
-          <div className="border-y border-ember/30 bg-black/60 px-4 py-3 md:px-6" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-            <div className="flex items-center justify-between gap-3 overflow-x-auto text-[11px] md:text-xs">
+          <div className="border-y border-ember/30 bg-black/60 px-3 py-2.5 md:px-5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+            <div className="flex items-center justify-between gap-2 text-[10px] md:text-[11px]">
               {/* Elapsed Time */}
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <ClockIcon />
-                <span className="text-sm font-bold text-ember md:text-base">01:23:45</span>
+                <span className="text-xs font-bold text-ember md:text-sm">01:23:45</span>
               </div>
-              <div className="h-5 w-px bg-ember/20" />
+              <div className="h-4 w-px bg-ember/20" />
               {/* CPU */}
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <span className="font-bold text-text-secondary">CPU</span>
-                <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/10 md:w-20">
+                <div className="h-1 w-10 overflow-hidden rounded-full bg-white/10 md:w-14">
                   <div className="h-full w-[34%] rounded-full bg-ember/85" />
                 </div>
                 <span className="text-ember font-semibold">34%</span>
               </div>
-              <div className="hidden h-5 w-px bg-ember/20 md:block" />
+              <div className="hidden h-4 w-px bg-ember/20 md:block" />
               {/* MEM */}
-              <div className="hidden shrink-0 items-center gap-2 md:flex">
+              <div className="hidden items-center gap-1.5 md:flex">
                 <span className="font-bold text-text-secondary">MEM</span>
-                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/10">
+                <div className="h-1 w-14 overflow-hidden rounded-full bg-white/10">
                   <div className="h-full w-[53%] rounded-full bg-ember/85" />
                 </div>
                 <span className="text-ember font-semibold">8.5/16GB</span>
               </div>
-              <div className="hidden h-5 w-px bg-ember/20 md:block" />
+              <div className="hidden h-4 w-px bg-ember/20 md:block" />
               {/* GPU */}
-              <div className="hidden shrink-0 items-center gap-2 md:flex">
+              <div className="hidden items-center gap-1.5 md:flex">
                 <span className="font-bold text-text-secondary">GPU</span>
-                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/10">
+                <div className="h-1 w-14 overflow-hidden rounded-full bg-white/10">
                   <div className="h-full w-[62%] rounded-full bg-ember/85" />
                 </div>
                 <span className="text-ember font-semibold">62%</span>
               </div>
-              <div className="hidden h-5 w-px bg-ember/20 md:block" />
+              <div className="hidden h-4 w-px bg-ember/20 lg:block" />
               {/* NET */}
-              <div className="hidden shrink-0 items-center gap-2 lg:flex">
+              <div className="hidden items-center gap-1.5 lg:flex">
                 <span className="font-bold text-text-secondary">NET</span>
                 <span className="text-text-secondary">&uarr;</span>
-                <span className="text-ember font-semibold">1.2MB/s</span>
+                <span className="text-ember font-semibold">1.2MB</span>
                 <span className="text-text-secondary">&darr;</span>
-                <span className="text-ember font-semibold">4.8MB/s</span>
+                <span className="text-ember font-semibold">4.8MB</span>
               </div>
             </div>
           </div>
