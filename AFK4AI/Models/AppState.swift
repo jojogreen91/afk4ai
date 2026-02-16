@@ -40,7 +40,7 @@ class AppState: ObservableObject {
     }
 
     func startLock() {
-        guard let window = selectedWindow else {
+        guard selectedWindow != nil else {
             lockError = l.errorSelectWindow
             return
         }
@@ -48,7 +48,7 @@ class AppState: ObservableObject {
         lockError = nil
         captureError = nil
 
-        // 1. InputBlocker 시도 — 실패해도 잠금 진행 (입력 차단만 안 됨)
+        // InputBlocker 시도 — 실패해도 잠금 진행
         let blocker = InputBlocker()
         blocker.onQuitAttempt = { [weak self] in
             self?.attemptUnlock { success in
@@ -57,15 +57,13 @@ class AppState: ObservableObject {
         }
         let blockingStarted = blocker.startBlocking()
         if !blockingStarted {
-            print("[AppState] InputBlocker failed — proceeding without input blocking")
             lockError = l.errorInputBlocking
         }
 
-        // 2. 잠금 활성화
         isLocked = true
         if blockingStarted { inputBlocker = blocker }
 
-        startStreaming()
+        startCapture()
         systemMetricsService = SystemMetricsService()
         systemMetricsService?.startMonitoring { [weak self] metrics in
             self?.systemMetrics = metrics
@@ -77,27 +75,23 @@ class AppState: ObservableObject {
         var error: NSError?
 
         guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
-            print("[AFK4AI] LocalAuthentication not available: \(error?.localizedDescription ?? "unknown")")
             completion(false)
             return
         }
 
-        // 1. Stop input blocking so the system auth dialog can receive input
         inputBlocker?.stopBlocking()
 
-        // 2. Lower window level so the auth dialog is visible above the lock screen
         let window = NSApplication.shared.windows.first
         window?.level = .normal
 
         context.evaluatePolicy(
             .deviceOwnerAuthentication,
             localizedReason: l.unlockReason
-        ) { [weak self] success, authError in
+        ) { [weak self] success, _ in
             DispatchQueue.main.async {
                 if success {
                     self?.stopLock()
                 } else {
-                    // Restore lock state: raise window level and re-enable blocking
                     window?.level = .screenSaver
                     self?.inputBlocker?.startBlocking()
                 }
@@ -108,7 +102,8 @@ class AppState: ObservableObject {
 
     func stopLock() {
         isLocked = false
-        stopStreaming()
+        windowCaptureService?.stopCapture()
+        windowCaptureService = nil
         inputBlocker?.stopBlocking()
         inputBlocker = nil
         systemMetricsService?.stopMonitoring()
@@ -118,30 +113,16 @@ class AppState: ObservableObject {
         captureError = nil
     }
 
-    private func startStreaming() {
-        guard let window = selectedWindow else {
-            print("[AppState] startStreaming: no selectedWindow!")
-            return
-        }
-        print("[AppState] startStreaming: windowID=\(window.windowID) name=\(window.displayName)")
-        windowCaptureService = WindowCaptureService(windowID: window.windowID, language: language)
-        windowCaptureService?.startStreaming(
+    private func startCapture() {
+        guard let window = selectedWindow else { return }
+        windowCaptureService = WindowCaptureService(windowID: window.windowID)
+        windowCaptureService?.startCapture(
             onFrame: { [weak self] image in
-                let isFirst = self?.capturedImage == nil
                 self?.capturedImage = image
-                if isFirst {
-                    print("[AppState] First captured image received: \(image.size)")
-                }
             },
             onError: { [weak self] error in
-                print("[AppState] Capture error: \(error)")
                 self?.captureError = error
             }
         )
-    }
-
-    private func stopStreaming() {
-        windowCaptureService?.stopStreaming()
-        windowCaptureService = nil
     }
 }
