@@ -10,6 +10,7 @@ struct SetupView: View {
     private var status: Color { appState.colorTheme.statusColor }
     private var bannerText: Color { appState.colorTheme.bannerTextColor }
     private var allPermissionsGranted: Bool { hasScreenPermission && hasAccessibilityPermission }
+    private var l: L { appState.l }
 
     var body: some View {
         ZStack {
@@ -24,6 +25,7 @@ struct SetupView: View {
                     permissionsSection
                     targetWindowSection
                     themeSection
+                    languageSection
                 }
                 .padding(.horizontal, 32)
 
@@ -47,8 +49,16 @@ struct SetupView: View {
     }
 
     private func checkPermissions() {
-        hasScreenPermission = Permissions.hasScreenRecordingPermission()
+        // Accessibility: 동기 체크 (빠름)
         hasAccessibilityPermission = Permissions.hasAccessibilityPermission()
+
+        // Screen Recording: SCShareableContent async 체크
+        Task {
+            let result = await Permissions.checkScreenRecordingPermission()
+            await MainActor.run {
+                hasScreenPermission = result
+            }
+        }
     }
 
     // MARK: - Header
@@ -65,7 +75,7 @@ struct SetupView: View {
             }
             .font(.system(size: 36, weight: .bold))
 
-            Text("AI 작업 중 화면을 지켜줍니다")
+            Text(l.subtitle)
                 .font(.system(size: 14))
                 .foregroundColor(.white.opacity(0.35))
         }
@@ -75,21 +85,21 @@ struct SetupView: View {
 
     private var permissionsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("권한")
+            Text(l.permissions)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(.white.opacity(0.4))
 
             VStack(spacing: 0) {
                 permissionRow(
-                    title: "화면 녹화",
+                    title: l.screenRecording,
                     granted: hasScreenPermission,
-                    action: { Permissions.requestScreenRecordingPermission() }
+                    action: { Task { await Permissions.requestScreenRecordingPermission() } }
                 )
 
                 Divider().background(Theme.borderDark)
 
                 permissionRow(
-                    title: "손쉬운 사용",
+                    title: l.accessibility,
                     granted: hasAccessibilityPermission,
                     action: { Permissions.requestAccessibilityPermission() }
                 )
@@ -112,7 +122,7 @@ struct SetupView: View {
                     .font(.system(size: 18))
                     .foregroundColor(status)
             } else {
-                Button("허용") {
+                Button(l.allow) {
                     action()
                 }
                 .font(.system(size: 13, weight: .semibold))
@@ -132,13 +142,13 @@ struct SetupView: View {
 
     private var targetWindowSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("모니터링 대상")
+            Text(l.monitorTarget)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(.white.opacity(0.4))
 
             HStack(spacing: 8) {
                 Picker("", selection: $appState.selectedWindow) {
-                    Text("창을 선택하세요")
+                    Text(l.selectWindow)
                         .tag(nil as WindowInfo?)
                     ForEach(appState.availableWindows) { window in
                         Text(window.displayName)
@@ -167,7 +177,7 @@ struct SetupView: View {
 
     private var themeSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("테마")
+            Text(l.theme)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(.white.opacity(0.4))
 
@@ -181,6 +191,41 @@ struct SetupView: View {
                             appState.colorTheme = theme
                         }
                     }
+                }
+            }
+        }
+    }
+
+    // MARK: - Language
+
+    private var languageSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(l.languageLabel)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.white.opacity(0.4))
+
+            HStack(spacing: 10) {
+                ForEach(Language.allCases) { lang in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            appState.language = lang
+                        }
+                    } label: {
+                        Text(lang.displayName)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(appState.language == lang ? bannerText : .white.opacity(0.6))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(appState.language == lang ? primary : Theme.surfaceDark)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(appState.language == lang ? Color.clear : Color.white.opacity(0.1), lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -214,7 +259,7 @@ struct SetupView: View {
                     .foregroundColor(.red.opacity(0.7))
                     .multilineTextAlignment(.center)
             } else if !allPermissionsGranted {
-                Text("권한을 먼저 허용해주세요")
+                Text(l.grantPermissionsFirst)
                     .font(.system(size: 12))
                     .foregroundColor(.white.opacity(0.3))
             }

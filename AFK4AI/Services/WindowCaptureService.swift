@@ -5,14 +5,16 @@ import CoreMedia
 
 class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
     private let windowID: CGWindowID
+    private let l: L
     private var stream: SCStream?
     private var onFrame: ((NSImage) -> Void)?
     private var onError: ((String) -> Void)?
     private let ciContext = CIContext()
     private var frameCount = 0
 
-    init(windowID: CGWindowID) {
+    init(windowID: CGWindowID, language: Language) {
         self.windowID = windowID
+        self.l = L(language)
         super.init()
         print("[Capture] init windowID=\(windowID)")
     }
@@ -26,7 +28,7 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
                 let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
 
                 guard let scWindow = content.windows.first(where: { $0.windowID == self.windowID }) else {
-                    let msg = "윈도우(ID=\(self.windowID))를 찾을 수 없습니다"
+                    let msg = self.l.errorWindowNotFound(id: self.windowID)
                     print("[Capture] ERROR: \(msg)")
                     await MainActor.run { self.onError?(msg) }
                     return
@@ -52,7 +54,7 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
                 self.stream = stream
                 print("[Capture] SCStream started successfully")
             } catch {
-                let msg = "캡처 시작 실패: \(error.localizedDescription)"
+                let msg = self.l.errorCaptureStart(error.localizedDescription)
                 print("[Capture] ERROR: \(msg)")
                 await MainActor.run { self.onError?(msg) }
             }
@@ -85,7 +87,7 @@ class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
     func stream(_ stream: SCStream, didStopWithError error: Error) {
         print("[Capture] Stream stopped with error: \(error.localizedDescription)")
         DispatchQueue.main.async { [weak self] in
-            self?.onError?("캡처 중단: \(error.localizedDescription)")
+            self?.onError?(self?.l.errorCaptureStopped(error.localizedDescription) ?? error.localizedDescription)
         }
     }
 

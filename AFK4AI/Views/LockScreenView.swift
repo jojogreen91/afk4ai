@@ -10,6 +10,7 @@ struct LockScreenView: View {
     private var primary: Color { appState.colorTheme.primary }
     private var status: Color { appState.colorTheme.statusColor }
     private var bannerText: Color { appState.colorTheme.bannerTextColor }
+    private var l: L { appState.l }
 
     var body: some View {
         ZStack {
@@ -94,7 +95,7 @@ struct LockScreenView: View {
                     ProgressView()
                         .controlSize(.large)
                         .tint(primary)
-                    Text("화면 연결 중...")
+                    Text(l.connecting)
                         .font(Theme.mono(14))
                         .foregroundColor(.white.opacity(0.3))
                 }
@@ -105,23 +106,12 @@ struct LockScreenView: View {
 
             // Compact status badge
             VStack {
-                Spacer()
                 HStack {
+                    LiveBadge(color: status)
+                        .padding(10)
                     Spacer()
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(status)
-                            .frame(width: 5, height: 5)
-                        Text("LIVE")
-                            .font(Theme.mono(9, weight: .bold))
-                            .foregroundColor(status)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(Color.black.opacity(0.6))
-                    .clipShape(Capsule())
-                    .padding(10)
                 }
+                Spacer()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -156,7 +146,7 @@ struct LockScreenView: View {
                         Image(systemName: "touchid")
                             .font(.system(size: 18))
                     }
-                    Text(isAuthenticating ? "인증 중..." : "잠금 해제")
+                    Text(isAuthenticating ? l.authenticating : l.unlock)
                         .font(Theme.display(14, weight: .bold))
                 }
                 .foregroundColor(.white.opacity(0.7))
@@ -174,7 +164,7 @@ struct LockScreenView: View {
             .disabled(isAuthenticating)
 
             if authFailed {
-                Text("인증에 실패했습니다")
+                Text(l.authFailed)
                     .font(Theme.display(11))
                     .foregroundColor(.red.opacity(0.7))
             }
@@ -182,7 +172,7 @@ struct LockScreenView: View {
             Button {
                 appState.stopLock()
             } label: {
-                Text("비상 탈출")
+                Text(l.emergencyExit)
                     .font(Theme.display(10, weight: .medium))
                     .foregroundColor(.white.opacity(0.2))
             }

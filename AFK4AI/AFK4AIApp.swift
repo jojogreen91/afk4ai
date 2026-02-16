@@ -45,6 +45,7 @@ struct ContentView: View {
 struct MenuBarView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.openWindow) private var openWindow
+    private var l: L { appState.l }
 
     var body: some View {
         if appState.isLocked {
@@ -59,7 +60,7 @@ struct MenuBarView: View {
             openWindow(id: "settings")
             NSApp.activate(ignoringOtherApps: true)
         } label: {
-            Label("설정 열기", systemImage: "gear")
+            Label(l.openSettings, systemImage: "gear")
         }
         .keyboardShortcut(",", modifiers: .command)
 
@@ -67,10 +68,11 @@ struct MenuBarView: View {
             Button {
                 appState.attemptUnlock { _ in }
             } label: {
-                Label("잠금 해제", systemImage: "touchid")
+                Label(l.unlock, systemImage: "touchid")
             }
         } else {
-            let hasScreen = Permissions.hasScreenRecordingPermission()
+            // 메뉴바에서는 동기 힌트로 CGPreflight 사용 (실제 검증은 startLock에서 async로)
+            let hasScreen = CGPreflightScreenCaptureAccess()
             let hasAccessibility = Permissions.hasAccessibilityPermission()
             let canLock = appState.selectedWindow != nil && hasScreen && hasAccessibility
 
@@ -82,21 +84,21 @@ struct MenuBarView: View {
                 }
             } label: {
                 if appState.selectedWindow == nil {
-                    Label("창을 먼저 선택하세요", systemImage: "macwindow")
+                    Label(l.selectWindowFirst, systemImage: "macwindow")
                 } else if !hasScreen || !hasAccessibility {
-                    Label("권한 설정 필요", systemImage: "exclamationmark.triangle")
+                    Label(l.permissionsRequired, systemImage: "exclamationmark.triangle")
                 } else {
-                    Label("잠금 시작", systemImage: "lock.fill")
+                    Label(l.startLock, systemImage: "lock.fill")
                 }
             }
             .disabled(!canLock)
 
             if !hasScreen {
-                Label("화면 녹화 권한 필요", systemImage: "xmark.circle")
+                Label(l.screenRecordingRequired, systemImage: "xmark.circle")
                     .disabled(true)
             }
             if !hasAccessibility {
-                Label("손쉬운 사용 권한 필요", systemImage: "xmark.circle")
+                Label(l.accessibilityRequired, systemImage: "xmark.circle")
                     .disabled(true)
             }
         }
@@ -110,7 +112,7 @@ struct MenuBarView: View {
 
         Divider()
 
-        Button("종료") {
+        Button(l.quit) {
             if appState.isLocked {
                 appState.attemptUnlock { success in
                     if success { NSApp.terminate(nil) }

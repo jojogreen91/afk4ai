@@ -10,6 +10,7 @@
 		02D1648D0EB7515D775FCBA4 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E467FBC3E677062DB02E57AE /* Theme.swift */; };
 		0799FC0CC2C28794FCB440C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 67599481E1C9F2F4287AA1AA /* Assets.xcassets */; };
 		13EEB88849B1B3A6B3098C19 /* HazardPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AFAD1B8717687C355D0F5B /* HazardPattern.swift */; };
+		39DA4EE173BD64B3F0628E16 /* LiveBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89031F6F433FB98A29480DCD /* LiveBadge.swift */; };
 		50C9F146EB9D98DCA8797266 /* WindowPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CEB329D809B0BAB60687F12 /* WindowPreviewView.swift */; };
 		541616086F296CBD72785EF0 /* WindowListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4517C575E3CCE1B6192F6094 /* WindowListService.swift */; };
 		7B0BECE8FD40AC9FFDBB004F /* SystemMetricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0CAAA7B10F8503F89A293BC /* SystemMetricsService.swift */; };
@@ -17,6 +18,7 @@
 		B57300BE4D48CBE637C8AB69 /* AFK4AIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805FFF2FEB1BF6DA0A6F1C19 /* AFK4AIApp.swift */; };
 		BE95FDF6DDD47DE9E8195C1A /* MetricsBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6300F46613CB6736CCB2494E /* MetricsBarView.swift */; };
 		BEF49AB5CCCB407E11CF1188 /* WindowCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFBC97648BE981F56A7ED43 /* WindowCaptureService.swift */; };
+		C695223AC13BC21982E0E175 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263540F5D61656A5BB16B351 /* Language.swift */; };
 		CB193F3B067ECC09BFC608EF /* WindowInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8F9FE189435E211D174D9B /* WindowInfo.swift */; };
 		E0955D3F4C0044D19E88B0EC /* LockScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58676866D87852A8D45E4408 /* LockScreenView.swift */; };
 		E1F4DB15A924BE4DB7C94A7E /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE556A83395C73C48D21CB11 /* Permissions.swift */; };
@@ -27,6 +29,7 @@
 
 /* Begin PBXFileReference section */
 		16B68FAED93D15AE0836F9A1 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
+		263540F5D61656A5BB16B351 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		2A91509789E62911DD45AACD /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		2F8F9FE189435E211D174D9B /* WindowInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowInfo.swift; sourceTree = "<group>"; };
 		3456F174CAB41BC958D39662 /* AFK4AI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AFK4AI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -38,6 +41,7 @@
 		67599481E1C9F2F4287AA1AA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6BC5882BB2AAB9E03BF965BD /* InputBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBlocker.swift; sourceTree = "<group>"; };
 		805FFF2FEB1BF6DA0A6F1C19 /* AFK4AIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFK4AIApp.swift; sourceTree = "<group>"; };
+		89031F6F433FB98A29480DCD /* LiveBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBadge.swift; sourceTree = "<group>"; };
 		ACB70FCF98852C4FD1D2501B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AE556A83395C73C48D21CB11 /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		D5AFAD1B8717687C355D0F5B /* HazardPattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardPattern.swift; sourceTree = "<group>"; };
@@ -60,6 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				2A91509789E62911DD45AACD /* AppState.swift */,
+				263540F5D61656A5BB16B351 /* Language.swift */,
 				5DB6F37CF9F1EA3B2240C0BF /* SystemMetrics.swift */,
 				2F8F9FE189435E211D174D9B /* WindowInfo.swift */,
 			);
@@ -89,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				D5AFAD1B8717687C355D0F5B /* HazardPattern.swift */,
+				89031F6F433FB98A29480DCD /* LiveBadge.swift */,
 				6300F46613CB6736CCB2494E /* MetricsBarView.swift */,
 			);
 			path = Components;
@@ -198,6 +204,8 @@
 				E365C07E6BFF7FEE47C78ADF /* AppState.swift in Sources */,
 				13EEB88849B1B3A6B3098C19 /* HazardPattern.swift in Sources */,
 				99C1300B7668A63FC9379910 /* InputBlocker.swift in Sources */,
+				C695223AC13BC21982E0E175 /* Language.swift in Sources */,
+				39DA4EE173BD64B3F0628E16 /* LiveBadge.swift in Sources */,
 				E0955D3F4C0044D19E88B0EC /* LockScreenView.swift in Sources */,
 				BE95FDF6DDD47DE9E8195C1A /* MetricsBarView.swift in Sources */,
 				E1F4DB15A924BE4DB7C94A7E /* Permissions.swift in Sources */,

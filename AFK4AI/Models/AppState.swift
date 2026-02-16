@@ -10,14 +10,26 @@ class AppState: ObservableObject {
     @Published var capturedImage: NSImage?
     @Published var bannerMessage: String = "AFK4AI"
     @Published var colorTheme: ColorTheme = .ember
+    @Published var language: Language = .ko {
+        didSet { UserDefaults.standard.set(language.rawValue, forKey: "language") }
+    }
     @Published var systemMetrics = SystemMetrics()
     @Published var lockError: String?
     @Published var captureError: String?
+
+    var l: L { L(language) }
 
     private let windowListService = WindowListService()
     private var windowCaptureService: WindowCaptureService?
     private var inputBlocker: InputBlocker?
     private var systemMetricsService: SystemMetricsService?
+
+    init() {
+        if let raw = UserDefaults.standard.string(forKey: "language"),
+           let lang = Language(rawValue: raw) {
+            self.language = lang
+        }
+    }
 
     func refreshWindowList() {
         availableWindows = windowListService.getWindowList()
@@ -29,14 +41,14 @@ class AppState: ObservableObject {
 
     func startLock() async {
         guard let window = selectedWindow else {
-            lockError = "모니터링할 창을 선택해주세요"
+            lockError = l.errorSelectWindow
             return
         }
 
         // 1. Validate screen recording permission via SCShareableContent
-        let hasPermission = await Permissions.validateScreenRecordingPermission()
+        let hasPermission = await Permissions.checkScreenRecordingPermission()
         guard hasPermission else {
-            lockError = "화면 녹화 권한이 필요합니다. 시스템 설정에서 권한을 허용한 후 앱을 재시작해주세요."
+            lockError = l.errorScreenRecording
             return
         }
 
@@ -44,11 +56,11 @@ class AppState: ObservableObject {
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
             guard content.windows.contains(where: { $0.windowID == window.windowID }) else {
-                lockError = "선택한 창을 찾을 수 없습니다. 창 목록을 새로고침해주세요."
+                lockError = l.errorWindowNotFound
                 return
             }
         } catch {
-            lockError = "화면 캡처 권한을 확인할 수 없습니다: \(error.localizedDescription)"
+            lockError = l.errorCapturePermission(error.localizedDescription)
             return
         }
 
@@ -66,7 +78,7 @@ class AppState: ObservableObject {
         }
         let blockingStarted = blocker.startBlocking()
         if !blockingStarted {
-            lockError = "입력 차단을 시작할 수 없습니다. 시스템 설정 > 개인정보 보호 및 보안 > 손쉬운 사용에서 AFK4AI를 제거 후 다시 추가해주세요."
+            lockError = l.errorInputBlocking
             blocker.stopBlocking()
             return
         }
@@ -102,7 +114,7 @@ class AppState: ObservableObject {
 
         context.evaluatePolicy(
             .deviceOwnerAuthentication,
-            localizedReason: "AFK4AI 잠금을 해제합니다"
+            localizedReason: l.unlockReason
         ) { [weak self] success, authError in
             DispatchQueue.main.async {
                 if success {
@@ -135,7 +147,7 @@ class AppState: ObservableObject {
             return
         }
         print("[AppState] startStreaming: windowID=\(window.windowID) name=\(window.displayName)")
-        windowCaptureService = WindowCaptureService(windowID: window.windowID)
+        windowCaptureService = WindowCaptureService(windowID: window.windowID, language: language)
         windowCaptureService?.startStreaming(
             onFrame: { [weak self] image in
                 let isFirst = self?.capturedImage == nil
