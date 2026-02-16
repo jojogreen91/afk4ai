@@ -4,47 +4,44 @@ import AppKit
 import ScreenCaptureKit
 
 enum Permissions {
+    private static var lastScreenPermission: Bool?
     private static var lastAccessibilityPermission: Bool?
+    private static var screenCheckCount = 0
     private static var accessibilityCheckCount = 0
 
-    // MARK: - Screen Recording (SCShareableContent 기반)
+    // MARK: - Screen Recording
 
-    /// SCShareableContent로 화면 녹화 권한을 검증한다.
-    /// macOS 15에서 CGPreflightScreenCaptureAccess()는 신뢰할 수 없으므로
-    /// 실제 SCShareableContent 호출 결과를 ground truth로 사용.
-    static func checkScreenRecordingPermission() async -> Bool {
+    /// 폴링용 동기 체크. 다이얼로그를 트리거하지 않는다.
+    static func hasScreenRecordingPermission() -> Bool {
+        screenCheckCount += 1
+        let result = CGPreflightScreenCaptureAccess()
+        if result != lastScreenPermission || screenCheckCount % 10 == 1 {
+            print("[Permissions] screenCheck #\(screenCheckCount): CGPreflight=\(result)")
+            lastScreenPermission = result
+        }
+        return result
+    }
+
+    /// 잠금 진입 전 실제 검증. SCShareableContent로 ground truth 확인.
+    static func validateScreenRecordingPermission() async -> Bool {
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
-            let granted = !content.windows.isEmpty
-            print("[Permissions] screenCheck: SCShareableContent windows=\(content.windows.count) → granted=\(granted)")
-            return granted
+            let valid = !content.windows.isEmpty
+            print("[Permissions] validateScreen: windows=\(content.windows.count) → \(valid)")
+            return valid
         } catch {
-            print("[Permissions] screenCheck: SCShareableContent error=\(error.localizedDescription) → denied")
+            print("[Permissions] validateScreen: error=\(error.localizedDescription)")
             return false
         }
     }
 
-    /// 화면 녹화 권한을 요청한다.
-    /// macOS 15에서는 SCShareableContent 호출이 시스템 다이얼로그를 트리거한다.
-    /// 이미 거부된 경우 다이얼로그가 안 뜨므로 시스템 설정을 연다.
-    static func requestScreenRecordingPermission() async {
-        print("[Permissions] requestScreenRecording: trying SCShareableContent...")
-        do {
-            let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
-            if !content.windows.isEmpty {
-                print("[Permissions] requestScreenRecording: already granted! windows=\(content.windows.count)")
-                return
-            }
-            // 빈 윈도우 목록 = 권한 거부됨, 시스템 설정으로 이동
-            print("[Permissions] requestScreenRecording: empty windows, opening System Settings...")
-            openScreenRecordingSettings()
-        } catch {
-            // 에러 = 권한 거부 또는 최초 요청 시 다이얼로그 표시됨
-            // macOS가 다이얼로그를 띄운 경우 에러로 반환하므로 잠시 대기 후 재확인
-            print("[Permissions] requestScreenRecording: SCShareableContent threw error=\(error.localizedDescription)")
-            print("[Permissions] requestScreenRecording: opening System Settings as fallback...")
-            openScreenRecordingSettings()
-        }
+    /// "허용" 버튼 클릭 시 호출. stale TCC 초기화 후 권한 요청.
+    static func requestScreenRecordingPermission() {
+        print("[Permissions] requestScreen: resetting stale TCC then requesting...")
+        resetTCC(service: "ScreenCapture")
+        // SCShareableContent가 아닌 CGRequestScreenCaptureAccess 사용하지 않음 (macOS 15에서 무반응)
+        // tccutil reset 후 시스템 설정을 열어서 사용자가 직접 토글
+        openScreenRecordingSettings()
     }
 
     // MARK: - Accessibility
@@ -69,7 +66,7 @@ enum Permissions {
         }
         let result = tapWorks || axTrusted
 
-        if result != lastAccessibilityPermission || accessibilityCheckCount % 5 == 1 {
+        if result != lastAccessibilityPermission || accessibilityCheckCount % 10 == 1 {
             print("[Permissions] accessibilityCheck #\(accessibilityCheckCount): AXTrusted=\(axTrusted) tapWorks=\(tapWorks) → \(result)")
             lastAccessibilityPermission = result
         }
@@ -77,12 +74,10 @@ enum Permissions {
     }
 
     static func requestAccessibilityPermission() {
-        print("[Permissions] requestAccessibility START")
-        // Ad-hoc 서명 앱의 stale TCC 엔트리 초기화
+        print("[Permissions] requestAccessibility: resetting stale TCC then requesting...")
         resetTCC(service: "Accessibility")
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-        let result = AXIsProcessTrustedWithOptions(options)
-        print("[Permissions] requestAccessibility: AXIsProcessTrustedWithOptions=\(result)")
+        AXIsProcessTrustedWithOptions(options)
     }
 
     // MARK: - Helpers
@@ -109,7 +104,6 @@ enum Permissions {
         }
     }
 
-    /// Relaunch the app (useful after permission changes that require restart).
     static func relaunchApp() {
         let url = URL(fileURLWithPath: Bundle.main.resourcePath!)
             .deletingLastPathComponent()

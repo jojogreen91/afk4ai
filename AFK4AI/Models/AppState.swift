@@ -3,6 +3,7 @@ import Combine
 import LocalAuthentication
 import ScreenCaptureKit
 
+@MainActor
 class AppState: ObservableObject {
     @Published var isLocked = false
     @Published var selectedWindow: WindowInfo?
@@ -46,7 +47,7 @@ class AppState: ObservableObject {
         }
 
         // 1. Validate screen recording permission via SCShareableContent
-        let hasPermission = await Permissions.checkScreenRecordingPermission()
+        let hasPermission = await Permissions.validateScreenRecordingPermission()
         guard hasPermission else {
             lockError = l.errorScreenRecording
             return

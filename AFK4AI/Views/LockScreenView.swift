@@ -104,13 +104,10 @@ struct LockScreenView: View {
             // Subtle scanline
             ScanlineOverlay(opacity: 0.08)
 
-            // Compact status badge
+            // Status badge (center-top)
             VStack {
-                HStack {
-                    LiveBadge(color: status)
-                        .padding(10)
-                    Spacer()
-                }
+                LiveBadge(color: status)
+                    .padding(.top, 10)
                 Spacer()
             }
         }

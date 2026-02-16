@@ -49,16 +49,8 @@ struct SetupView: View {
     }
 
     private func checkPermissions() {
-        // Accessibility: 동기 체크 (빠름)
+        hasScreenPermission = Permissions.hasScreenRecordingPermission()
         hasAccessibilityPermission = Permissions.hasAccessibilityPermission()
-
-        // Screen Recording: SCShareableContent async 체크
-        Task {
-            let result = await Permissions.checkScreenRecordingPermission()
-            await MainActor.run {
-                hasScreenPermission = result
-            }
-        }
     }
 
     // MARK: - Header
@@ -93,7 +85,7 @@ struct SetupView: View {
                 permissionRow(
                     title: l.screenRecording,
                     granted: hasScreenPermission,
-                    action: { Task { await Permissions.requestScreenRecordingPermission() } }
+                    action: { Permissions.requestScreenRecordingPermission() }
                 )
 
                 Divider().background(Theme.borderDark)
@@ -122,15 +114,17 @@ struct SetupView: View {
                     .font(.system(size: 18))
                     .foregroundColor(status)
             } else {
-                Button(l.allow) {
+                Button {
                     action()
+                } label: {
+                    Text(l.allow)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(bannerText)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 6)
+                        .background(primary)
+                        .clipShape(Capsule())
                 }
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(bannerText)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 6)
-                .background(primary)
-                .clipShape(Capsule())
                 .buttonStyle(.plain)
             }
         }
