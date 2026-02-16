@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import LocalAuthentication
+import ScreenCaptureKit
 
 class AppState: ObservableObject {
     @Published var isLocked = false
@@ -11,6 +12,7 @@ class AppState: ObservableObject {
     @Published var colorTheme: ColorTheme = .ember
     @Published var systemMetrics = SystemMetrics()
     @Published var lockError: String?
+    @Published var captureError: String?
 
     private let windowListService = WindowListService()
     private var windowCaptureService: WindowCaptureService?
@@ -25,15 +27,35 @@ class AppState: ObservableObject {
         }
     }
 
-    func startLock() {
-        guard Permissions.hasScreenRecordingPermission() else {
-            lockError = "화면 녹화 권한이 필요합니다"
+    func startLock() async {
+        guard let window = selectedWindow else {
+            lockError = "모니터링할 창을 선택해주세요"
+            return
+        }
+
+        // 1. Validate screen recording permission via SCShareableContent
+        let hasPermission = await Permissions.validateScreenRecordingPermission()
+        guard hasPermission else {
+            lockError = "화면 녹화 권한이 필요합니다. 시스템 설정에서 권한을 허용한 후 앱을 재시작해주세요."
+            return
+        }
+
+        // Verify the target window exists in SCShareableContent
+        do {
+            let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+            guard content.windows.contains(where: { $0.windowID == window.windowID }) else {
+                lockError = "선택한 창을 찾을 수 없습니다. 창 목록을 새로고침해주세요."
+                return
+            }
+        } catch {
+            lockError = "화면 캡처 권한을 확인할 수 없습니다: \(error.localizedDescription)"
             return
         }
 
         lockError = nil
+        captureError = nil
 
-        // Try to create InputBlocker and verify event tap actually works
+        // 2. Start InputBlocker
         let blocker = InputBlocker()
         blocker.onQuitAttempt = { [weak self] in
             self?.attemptUnlock { success in
@@ -49,8 +71,11 @@ class AppState: ObservableObject {
             return
         }
 
+        // 3. Activate lock
         isLocked = true
         inputBlocker = blocker
+
+        // 4. Start streaming (async, in background)
         startStreaming()
         systemMetricsService = SystemMetricsService()
         systemMetricsService?.startMonitoring { [weak self] metrics in
@@ -101,6 +126,7 @@ class AppState: ObservableObject {
         systemMetricsService = nil
         systemMetrics = SystemMetrics()
         capturedImage = nil
+        captureError = nil
     }
 
     private func startStreaming() {
@@ -110,13 +136,19 @@ class AppState: ObservableObject {
         }
         print("[AppState] startStreaming: windowID=\(window.windowID) name=\(window.displayName)")
         windowCaptureService = WindowCaptureService(windowID: window.windowID)
-        windowCaptureService?.startStreaming { [weak self] image in
-            let isFirst = self?.capturedImage == nil
-            self?.capturedImage = image
-            if isFirst {
-                print("[AppState] First captured image received: \(image.size)")
+        windowCaptureService?.startStreaming(
+            onFrame: { [weak self] image in
+                let isFirst = self?.capturedImage == nil
+                self?.capturedImage = image
+                if isFirst {
+                    print("[AppState] First captured image received: \(image.size)")
+                }
+            },
+            onError: { [weak self] error in
+                print("[AppState] Capture error: \(error)")
+                self?.captureError = error
             }
-        }
+        )
     }
 
     private func stopStreaming() {

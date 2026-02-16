@@ -4,19 +4,19 @@ import AppKit
 import ScreenCaptureKit
 
 enum Permissions {
+    private static var lastScreenPermission: Bool?
+    private static var lastAccessibilityPermission: Bool?
+
     static func hasScreenRecordingPermission() -> Bool {
-        // On macOS 14+, CGWindowListCopyWindowInfo returns metadata even without
-        // screen recording permission, but CGWindowListCreateImage returns nil.
-        // Use CGPreflightScreenCaptureAccess as the sole check to avoid false positives.
         let result = CGPreflightScreenCaptureAccess()
-        print("[Permissions] hasScreenRecordingPermission: CGPreflight=\(result)")
+        if result != lastScreenPermission {
+            print("[Permissions] hasScreenRecordingPermission: \(result)")
+            lastScreenPermission = result
+        }
         return result
     }
 
     static func hasAccessibilityPermission() -> Bool {
-        // Don't rely on AXIsProcessTrusted alone - it returns stale results
-        // with ad-hoc signed apps. Instead, try creating the actual event tap
-        // (same type InputBlocker uses) as the ground truth test.
         let testTap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
@@ -25,31 +25,58 @@ enum Permissions {
             callback: { _, _, event, _ in Unmanaged.passRetained(event) },
             userInfo: nil
         )
+        let result: Bool
         if let tap = testTap {
             CFMachPortInvalidate(tap)
-            return true
+            result = true
+        } else {
+            result = AXIsProcessTrusted()
         }
-        // Also check AXIsProcessTrusted as a secondary signal
-        return AXIsProcessTrusted()
+        if result != lastAccessibilityPermission {
+            print("[Permissions] hasAccessibilityPermission: \(result)")
+            lastAccessibilityPermission = result
+        }
+        return result
+    }
+
+    /// Validate screen recording permission by actually querying SCShareableContent.
+    /// This is the ground truth check — CGPreflightScreenCaptureAccess can lie.
+    static func validateScreenRecordingPermission() async -> Bool {
+        do {
+            let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+            let valid = !content.windows.isEmpty
+            print("[Permissions] validateScreenRecording: windows=\(content.windows.count) valid=\(valid)")
+            return valid
+        } catch {
+            print("[Permissions] validateScreenRecording failed: \(error.localizedDescription)")
+            return false
+        }
     }
 
     static func requestScreenRecordingPermission() {
-        // Reset stale TCC entry for ad-hoc signed apps (same reason as accessibility)
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
-        process.arguments = ["reset", "ScreenCapture", Bundle.main.bundleIdentifier ?? "com.afk4ai.AFK4AI"]
-        try? process.run()
-        process.waitUntilExit()
-        print("[Permissions] TCC ScreenCapture reset, requesting access...")
+        // Ad-hoc 서명 앱은 빌드마다 코드 해시가 바뀌어 TCC 엔트리가 stale 됨.
+        // 시스템 설정에서 ON으로 보여도 실제로는 작동하지 않으므로 reset 후 재요청.
+        resetTCC(service: "ScreenCapture")
         CGRequestScreenCaptureAccess()
     }
 
-    /// Pre-trigger screen recording permission dialog via SCShareableContent.
-    /// This must be called during setup so the dialog appears before lock activation.
-    static func preauthorizeScreenCapture() {
-        Task {
-            _ = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
-        }
+    static func requestAccessibilityPermission() {
+        // Ad-hoc 서명 앱의 stale TCC 엔트리 초기화 후 재요청
+        resetTCC(service: "Accessibility")
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        AXIsProcessTrustedWithOptions(options)
+    }
+
+    /// Clear stale TCC entry for ad-hoc signed builds.
+    /// Only called when user explicitly requests permission (clicks "허용").
+    private static func resetTCC(service: String) {
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.afk4ai.AFK4AI"
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+        process.arguments = ["reset", service, bundleID]
+        try? process.run()
+        process.waitUntilExit()
+        print("[Permissions] TCC \(service) reset for \(bundleID)")
     }
 
     static func openScreenRecordingSettings() {
@@ -64,19 +91,16 @@ enum Permissions {
         }
     }
 
-    /// Reset stale TCC entry and re-request accessibility permission.
-    /// Ad-hoc signed apps get a new code hash on every rebuild, so the old
-    /// TCC entry becomes stale (shows ON in System Settings but doesn't work).
-    static func requestAccessibilityPermission() {
-        // Reset stale TCC entries for our bundle ID so macOS re-evaluates
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
-        process.arguments = ["reset", "Accessibility", Bundle.main.bundleIdentifier ?? "com.afk4ai.AFK4AI"]
-        try? process.run()
-        process.waitUntilExit()
-
-        // Now request fresh permission - this will show the system prompt
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-        AXIsProcessTrustedWithOptions(options)
+    /// Relaunch the app (useful after permission changes that require restart).
+    static func relaunchApp() {
+        let url = URL(fileURLWithPath: Bundle.main.resourcePath!)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        task.arguments = [url.path]
+        try? task.run()
+        NSApp.terminate(nil)
     }
 }

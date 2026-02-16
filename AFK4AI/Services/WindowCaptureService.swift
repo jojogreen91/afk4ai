@@ -1,74 +1,100 @@
 import Foundation
 import AppKit
+import ScreenCaptureKit
+import CoreMedia
 
-class WindowCaptureService {
+class WindowCaptureService: NSObject, SCStreamOutput, SCStreamDelegate {
     private let windowID: CGWindowID
-    private var task: Task<Void, Never>?
+    private var stream: SCStream?
+    private var onFrame: ((NSImage) -> Void)?
+    private var onError: ((String) -> Void)?
+    private let ciContext = CIContext()
     private var frameCount = 0
-    private var nilCount = 0
 
     init(windowID: CGWindowID) {
         self.windowID = windowID
+        super.init()
         print("[Capture] init windowID=\(windowID)")
     }
 
-    func startStreaming(onFrame: @escaping (NSImage) -> Void) {
-        print("[Capture] startStreaming called for windowID=\(windowID)")
-        print("[Capture] CGPreflightScreenCaptureAccess=\(CGPreflightScreenCaptureAccess())")
+    func startStreaming(onFrame: @escaping (NSImage) -> Void, onError: ((String) -> Void)? = nil) {
+        self.onFrame = onFrame
+        self.onError = onError
 
-        // 시작 전 해당 윈도우가 존재하는지 확인
-        if let windowList = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] {
-            let match = windowList.first { ($0[kCGWindowNumber as String] as? CGWindowID) == windowID }
-            if let match = match {
-                let owner = match[kCGWindowOwnerName as String] as? String ?? "?"
-                let name = match[kCGWindowName as String] as? String ?? "?"
-                let bounds = match[kCGWindowBounds as String]
-                print("[Capture] Window found: owner=\(owner) name=\(name) bounds=\(bounds ?? "nil")")
-            } else {
-                print("[Capture] WARNING: windowID=\(windowID) NOT found in CGWindowList! Total windows: \(windowList.count)")
-                // 존재하는 윈도우 ID 목록 출력 (처음 10개)
-                let ids = windowList.compactMap { $0[kCGWindowNumber as String] as? CGWindowID }.prefix(10)
-                print("[Capture] Available window IDs (first 10): \(Array(ids))")
+        Task {
+            do {
+                let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+
+                guard let scWindow = content.windows.first(where: { $0.windowID == self.windowID }) else {
+                    let msg = "윈도우(ID=\(self.windowID))를 찾을 수 없습니다"
+                    print("[Capture] ERROR: \(msg)")
+                    await MainActor.run { self.onError?(msg) }
+                    return
+                }
+
+                print("[Capture] Found window: \(scWindow.owningApplication?.applicationName ?? "?") - \(scWindow.title ?? "?")")
+
+                let filter = SCContentFilter(desktopIndependentWindow: scWindow)
+                let config = SCStreamConfiguration()
+
+                // Retina display support
+                let scaleFactor = NSScreen.main?.backingScaleFactor ?? 2.0
+                config.width = Int(CGFloat(scWindow.frame.width) * scaleFactor)
+                config.height = Int(CGFloat(scWindow.frame.height) * scaleFactor)
+                config.minimumFrameInterval = CMTime(value: 1, timescale: 10) // 10 FPS
+                config.showsCursor = false
+                config.pixelFormat = kCVPixelFormatType_32BGRA
+
+                let stream = SCStream(filter: filter, configuration: config, delegate: self)
+                try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .global(qos: .userInteractive))
+                try await stream.startCapture()
+
+                self.stream = stream
+                print("[Capture] SCStream started successfully")
+            } catch {
+                let msg = "캡처 시작 실패: \(error.localizedDescription)"
+                print("[Capture] ERROR: \(msg)")
+                await MainActor.run { self.onError?(msg) }
             }
-        } else {
-            print("[Capture] WARNING: CGWindowListCopyWindowInfo returned nil!")
+        }
+    }
+
+    // MARK: - SCStreamOutput
+
+    func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
+        guard type == .screen else { return }
+        guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
+
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return }
+
+        let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+
+        frameCount += 1
+        if frameCount <= 3 || frameCount % 300 == 0 {
+            print("[Capture] Frame #\(frameCount): \(cgImage.width)x\(cgImage.height)")
         }
 
-        task = Task {
-            print("[Capture] Task loop started")
-            while !Task.isCancelled {
-                let cgImage = CGWindowListCreateImage(
-                    .null,
-                    .optionIncludingWindow,
-                    windowID,
-                    [.boundsIgnoreFraming, .nominalResolution]
-                )
+        DispatchQueue.main.async { [weak self] in
+            self?.onFrame?(nsImage)
+        }
+    }
 
-                if let cgImage = cgImage {
-                    frameCount += 1
-                    if frameCount <= 3 || frameCount % 100 == 0 {
-                        print("[Capture] Frame #\(frameCount): \(cgImage.width)x\(cgImage.height)")
-                    }
-                    let nsImage = NSImage(
-                        cgImage: cgImage,
-                        size: NSSize(width: cgImage.width, height: cgImage.height)
-                    )
-                    await MainActor.run { onFrame(nsImage) }
-                } else {
-                    nilCount += 1
-                    if nilCount <= 5 || nilCount % 50 == 0 {
-                        print("[Capture] CGWindowListCreateImage returned nil (#\(nilCount)) for windowID=\(windowID)")
-                    }
-                }
-                try? await Task.sleep(for: .milliseconds(100))
-            }
-            print("[Capture] Task loop ended (cancelled=\(Task.isCancelled))")
+    // MARK: - SCStreamDelegate
+
+    func stream(_ stream: SCStream, didStopWithError error: Error) {
+        print("[Capture] Stream stopped with error: \(error.localizedDescription)")
+        DispatchQueue.main.async { [weak self] in
+            self?.onError?("캡처 중단: \(error.localizedDescription)")
         }
     }
 
     func stopStreaming() {
-        print("[Capture] stopStreaming called, frames=\(frameCount) nils=\(nilCount)")
-        task?.cancel()
-        task = nil
+        print("[Capture] stopStreaming called, frames=\(frameCount)")
+        guard let stream = stream else { return }
+        self.stream = nil
+        Task {
+            try? await stream.stopCapture()
+        }
     }
 }

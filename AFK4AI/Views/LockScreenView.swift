@@ -78,6 +78,17 @@ struct LockScreenView: View {
                 Image(nsImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
+            } else if let error = appState.captureError {
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 32))
+                        .foregroundColor(.red.opacity(0.6))
+                    Text(error)
+                        .font(Theme.mono(12))
+                        .foregroundColor(.red.opacity(0.6))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
             } else {
                 VStack(spacing: 12) {
                     ProgressView()

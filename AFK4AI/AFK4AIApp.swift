@@ -78,7 +78,7 @@ struct MenuBarView: View {
                 openWindow(id: "settings")
                 NSApp.activate(ignoringOtherApps: true)
                 if canLock {
-                    appState.startLock()
+                    Task { await appState.startLock() }
                 }
             } label: {
                 if appState.selectedWindow == nil {

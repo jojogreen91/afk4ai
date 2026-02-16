@@ -37,7 +37,6 @@ struct SetupView: View {
         .onAppear {
             appState.refreshWindowList()
             checkPermissions()
-            Permissions.preauthorizeScreenCapture()
             permissionTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
                 checkPermissions()
             }
@@ -192,7 +191,7 @@ struct SetupView: View {
     private var activateButton: some View {
         VStack(spacing: 8) {
             Button {
-                appState.startLock()
+                Task { await appState.startLock() }
             } label: {
                 Text("ACTIVATE")
                     .font(.system(size: 16, weight: .bold))
