@@ -206,27 +206,20 @@ struct SetupView: View {
             Button {
                 appState.startLock()
             } label: {
-                HStack(spacing: 8) {
-                    if appState.isActivating {
-                        ProgressView()
-                            .controlSize(.small)
-                            .tint(bannerText)
-                    }
-                    Text("ACTIVATE")
-                        .font(.system(size: 16, weight: .bold))
-                        .tracking(3)
-                }
-                .foregroundColor(bannerText)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(primary)
-                )
+                Text("ACTIVATE")
+                    .font(.system(size: 16, weight: .bold))
+                    .tracking(3)
+                    .foregroundColor(bannerText)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(primary)
+                    )
             }
             .buttonStyle(.plain)
-            .disabled(appState.selectedWindow == nil || appState.isActivating)
-            .opacity(appState.selectedWindow == nil || appState.isActivating ? 0.3 : 1.0)
+            .disabled(appState.selectedWindow == nil)
+            .opacity(appState.selectedWindow == nil ? 0.3 : 1.0)
 
             if let error = appState.lockError {
                 Text(error)

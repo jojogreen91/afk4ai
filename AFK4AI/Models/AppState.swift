@@ -1,12 +1,10 @@
 import SwiftUI
 import Combine
 import LocalAuthentication
-import ScreenCaptureKit
 
 @MainActor
 class AppState: ObservableObject {
     @Published var isLocked = false
-    @Published var isActivating = false
     @Published var selectedWindow: WindowInfo?
     @Published var availableWindows: [WindowInfo] = []
     @Published var capturedImage: NSImage?
@@ -49,30 +47,8 @@ class AppState: ObservableObject {
 
         lockError = nil
         captureError = nil
-        isActivating = true
 
-        // 1. 잠금 화면 진입 전에 캡처 권한 확인
-        Task {
-            do {
-                let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
-                guard content.windows.contains(where: { $0.windowID == window.windowID }) else {
-                    lockError = l.errorWindowNotFound
-                    isActivating = false
-                    return
-                }
-            } catch {
-                lockError = l.errorScreenRecording
-                isActivating = false
-                return
-            }
-
-            // 2. 권한 확인됨 → 잠금 진입
-            enterLock()
-        }
-    }
-
-    private func enterLock() {
-        // InputBlocker 시도 — 실패해도 잠금 진행
+        // 1. InputBlocker 시도 — 실패해도 잠금 진행 (입력 차단만 안 됨)
         let blocker = InputBlocker()
         blocker.onQuitAttempt = { [weak self] in
             self?.attemptUnlock { success in
@@ -85,8 +61,8 @@ class AppState: ObservableObject {
             lockError = l.errorInputBlocking
         }
 
+        // 2. 잠금 활성화
         isLocked = true
-        isActivating = false
         if blockingStarted { inputBlocker = blocker }
 
         startStreaming()
