@@ -1,10 +1,12 @@
 import SwiftUI
 import Combine
 import LocalAuthentication
+import ScreenCaptureKit
 
 @MainActor
 class AppState: ObservableObject {
     @Published var isLocked = false
+    @Published var isActivating = false
     @Published var selectedWindow: WindowInfo?
     @Published var availableWindows: [WindowInfo] = []
     @Published var capturedImage: NSImage?
@@ -47,14 +49,34 @@ class AppState: ObservableObject {
 
         lockError = nil
         captureError = nil
+        isActivating = true
 
-        // 1. InputBlocker 시도 — 실패해도 잠금 진행 (입력 차단만 안 됨)
+        // 1. 잠금 화면 진입 전에 캡처 권한 확인
+        Task {
+            do {
+                let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+                guard content.windows.contains(where: { $0.windowID == window.windowID }) else {
+                    lockError = l.errorWindowNotFound
+                    isActivating = false
+                    return
+                }
+            } catch {
+                lockError = l.errorScreenRecording
+                isActivating = false
+                return
+            }
+
+            // 2. 권한 확인됨 → 잠금 진입
+            enterLock()
+        }
+    }
+
+    private func enterLock() {
+        // InputBlocker 시도 — 실패해도 잠금 진행
         let blocker = InputBlocker()
         blocker.onQuitAttempt = { [weak self] in
             self?.attemptUnlock { success in
-                if success {
-                    NSApp.terminate(nil)
-                }
+                if success { NSApp.terminate(nil) }
             }
         }
         let blockingStarted = blocker.startBlocking()
@@ -63,11 +85,10 @@ class AppState: ObservableObject {
             lockError = l.errorInputBlocking
         }
 
-        // 2. 잠금 활성화 — 스트리밍은 onError 콜백으로 실패 처리
         isLocked = true
+        isActivating = false
         if blockingStarted { inputBlocker = blocker }
 
-        // 4. Start streaming (async, in background)
         startStreaming()
         systemMetricsService = SystemMetricsService()
         systemMetricsService?.startMonitoring { [weak self] metrics in
