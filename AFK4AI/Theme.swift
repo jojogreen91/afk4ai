@@ -5,8 +5,8 @@ import SwiftUI
 enum ColorTheme: String, CaseIterable, Identifiable {
     case ember   // 기본 붉은색
     case mono    // 블랙 & 화이트
-    case ocean   // 차분한 파란색
-    case matrix  // 초록색
+    case ocean   // 어두운 파란색
+    case matrix  // 터미널 초록색
 
     var id: String { rawValue }
 
@@ -23,8 +23,8 @@ enum ColorTheme: String, CaseIterable, Identifiable {
         switch self {
         case .ember:  return Color(hex: 0xFF4D00)
         case .mono:   return Color(hex: 0xFFFFFF)
-        case .ocean:  return Color(hex: 0x2563EB)
-        case .matrix: return Color(hex: 0x16A34A)
+        case .ocean:  return Color(hex: 0x1E40AF)
+        case .matrix: return Color(hex: 0x059669)
         }
     }
 
@@ -32,8 +32,8 @@ enum ColorTheme: String, CaseIterable, Identifiable {
         switch self {
         case .ember:  return Color(hex: 0x00FF41)
         case .mono:   return Color(hex: 0xAAAAAA)
-        case .ocean:  return Color(hex: 0x0891B2)
-        case .matrix: return Color(hex: 0x00D946)
+        case .ocean:  return Color(hex: 0x0E7490)
+        case .matrix: return Color(hex: 0x34D399)
         }
     }
 
@@ -43,7 +43,7 @@ enum ColorTheme: String, CaseIterable, Identifiable {
         case .ember:  return .black
         case .mono:   return .black
         case .ocean:  return .white
-        case .matrix: return .black
+        case .matrix: return .white
         }
     }
 
@@ -52,8 +52,8 @@ enum ColorTheme: String, CaseIterable, Identifiable {
         switch self {
         case .ember:  return [Color(hex: 0xFF4D00), Color(hex: 0xFF6B2B)]
         case .mono:   return [Color(hex: 0xFFFFFF), Color(hex: 0x888888)]
-        case .ocean:  return [Color(hex: 0x2563EB), Color(hex: 0x3B82F6)]
-        case .matrix: return [Color(hex: 0x16A34A), Color(hex: 0x22C55E)]
+        case .ocean:  return [Color(hex: 0x1E40AF), Color(hex: 0x2563EB)]
+        case .matrix: return [Color(hex: 0x059669), Color(hex: 0x10B981)]
         }
     }
 }

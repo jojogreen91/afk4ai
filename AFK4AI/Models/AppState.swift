@@ -1,7 +1,6 @@
 import SwiftUI
 import Combine
 import LocalAuthentication
-import ScreenCaptureKit
 
 @MainActor
 class AppState: ObservableObject {
@@ -40,35 +39,16 @@ class AppState: ObservableObject {
         }
     }
 
-    func startLock() async {
+    func startLock() {
         guard let window = selectedWindow else {
             lockError = l.errorSelectWindow
-            return
-        }
-
-        // 1. Validate screen recording permission via SCShareableContent
-        let hasPermission = await Permissions.validateScreenRecordingPermission()
-        guard hasPermission else {
-            lockError = l.errorScreenRecording
-            return
-        }
-
-        // Verify the target window exists in SCShareableContent
-        do {
-            let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
-            guard content.windows.contains(where: { $0.windowID == window.windowID }) else {
-                lockError = l.errorWindowNotFound
-                return
-            }
-        } catch {
-            lockError = l.errorCapturePermission(error.localizedDescription)
             return
         }
 
         lockError = nil
         captureError = nil
 
-        // 2. Start InputBlocker
+        // 1. InputBlocker 시도 — 실패해도 잠금 진행 (입력 차단만 안 됨)
         let blocker = InputBlocker()
         blocker.onQuitAttempt = { [weak self] in
             self?.attemptUnlock { success in
@@ -79,14 +59,13 @@ class AppState: ObservableObject {
         }
         let blockingStarted = blocker.startBlocking()
         if !blockingStarted {
+            print("[AppState] InputBlocker failed — proceeding without input blocking")
             lockError = l.errorInputBlocking
-            blocker.stopBlocking()
-            return
         }
 
-        // 3. Activate lock
+        // 2. 잠금 활성화 — 스트리밍은 onError 콜백으로 실패 처리
         isLocked = true
-        inputBlocker = blocker
+        if blockingStarted { inputBlocker = blocker }
 
         // 4. Start streaming (async, in background)
         startStreaming()

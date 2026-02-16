@@ -71,36 +71,21 @@ struct MenuBarView: View {
                 Label(l.unlock, systemImage: "touchid")
             }
         } else {
-            // 메뉴바에서는 동기 힌트로 CGPreflight 사용 (실제 검증은 startLock에서 async로)
-            let hasScreen = CGPreflightScreenCaptureAccess()
-            let hasAccessibility = Permissions.hasAccessibilityPermission()
-            let canLock = appState.selectedWindow != nil && hasScreen && hasAccessibility
-
             Button {
-                openWindow(id: "settings")
-                NSApp.activate(ignoringOtherApps: true)
-                if canLock {
-                    Task { await appState.startLock() }
+                if appState.selectedWindow != nil {
+                    appState.startLock()
+                } else {
+                    openWindow(id: "settings")
+                    NSApp.activate(ignoringOtherApps: true)
                 }
             } label: {
                 if appState.selectedWindow == nil {
                     Label(l.selectWindowFirst, systemImage: "macwindow")
-                } else if !hasScreen || !hasAccessibility {
-                    Label(l.permissionsRequired, systemImage: "exclamationmark.triangle")
                 } else {
                     Label(l.startLock, systemImage: "lock.fill")
                 }
             }
-            .disabled(!canLock)
-
-            if !hasScreen {
-                Label(l.screenRecordingRequired, systemImage: "xmark.circle")
-                    .disabled(true)
-            }
-            if !hasAccessibility {
-                Label(l.accessibilityRequired, systemImage: "xmark.circle")
-                    .disabled(true)
-            }
+            .disabled(appState.selectedWindow == nil)
         }
 
         Divider()

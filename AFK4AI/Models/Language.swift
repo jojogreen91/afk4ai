@@ -57,20 +57,20 @@ struct L {
 
     var errorSelectWindow: String { s("모니터링할 창을 선택해주세요", "Please select a window to monitor") }
     var errorScreenRecording: String { s(
-        "화면 녹화 권한이 필요합니다. 시스템 설정에서 권한을 허용한 후 앱을 재시작해주세요.",
-        "Screen recording permission is required. Please grant permission in System Settings and restart the app."
+        "화면 녹화 실패: 시스템 설정 > 화면 녹화에서 AFK4AI를 끄고 다시 켜주세요",
+        "Screen recording failed: Toggle AFK4AI OFF then ON in Screen Recording settings"
     ) }
     var errorWindowNotFound: String { s(
         "선택한 창을 찾을 수 없습니다. 창 목록을 새로고침해주세요.",
-        "Selected window not found. Please refresh the window list."
+        "Window not found. Please refresh the window list."
     ) }
     func errorCapturePermission(_ detail: String) -> String { s(
-        "화면 캡처 권한을 확인할 수 없습니다: \(detail)",
-        "Cannot verify screen capture permission: \(detail)"
+        "화면 캡처 실패: \(detail) — 시스템 설정에서 AFK4AI를 끄고 다시 켜주세요",
+        "Capture failed: \(detail) — Toggle AFK4AI OFF then ON in Screen Recording settings"
     ) }
     var errorInputBlocking: String { s(
-        "입력 차단을 시작할 수 없습니다. 시스템 설정 > 개인정보 보호 및 보안 > 손쉬운 사용에서 AFK4AI를 제거 후 다시 추가해주세요.",
-        "Cannot start input blocking. Please remove and re-add AFK4AI in System Settings > Privacy & Security > Accessibility."
+        "입력 차단 실패: 손쉬운 사용 > AFK4AI를 끄고 다시 켜주세요",
+        "Input blocking failed: Toggle AFK4AI OFF then ON in Accessibility settings"
     ) }
     var unlockReason: String { s("AFK4AI 잠금을 해제합니다", "Unlock AFK4AI") }
 
@@ -81,11 +81,11 @@ struct L {
         "Window (ID=\(id)) not found"
     ) }
     func errorCaptureStart(_ detail: String) -> String { s(
-        "캡처 시작 실패: \(detail)",
-        "Capture failed: \(detail)"
+        "캡처 시작 실패: \(detail) — 시스템 설정에서 화면 녹화 권한을 끄고 다시 켜주세요",
+        "Capture failed: \(detail) — Toggle OFF then ON in Screen Recording settings"
     ) }
     func errorCaptureStopped(_ detail: String) -> String { s(
-        "캡처 중단: \(detail)",
-        "Capture stopped: \(detail)"
+        "캡처 중단: \(detail) — 시스템 설정에서 화면 녹화 권한을 끄고 다시 켜주세요",
+        "Capture stopped: \(detail) — Toggle OFF then ON in Screen Recording settings"
     ) }
 }
