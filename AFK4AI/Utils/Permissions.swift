@@ -12,6 +12,9 @@ enum Permissions {
     }
 
     static func openAccessibilitySettings() {
+        // 시스템 설정 목록에 앱 등록 (최초 1회)
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        AXIsProcessTrustedWithOptions(options)
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
             NSWorkspace.shared.open(url)
         }
