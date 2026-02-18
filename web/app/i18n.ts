@@ -148,13 +148,13 @@ export const t = {
         ko: "화면이 선택되었습니다",
         en: "Screen selected",
       },
-      landing: { ko: "랜딩 페이지로", en: "Landing Page" },
+      landing: { ko: "사용 방법", en: "How to Use" },
     },
     lock: {
       elapsed: { ko: "경과 시간", en: "Elapsed" },
       unlockHint: {
-        ko: "잠금 해제하려면 3초간 길게 누르세요",
-        en: "Hold for 3 seconds to unlock",
+        ko: "잠금 해제하려면 2초간 길게 누르세요",
+        en: "Hold for 2 seconds to unlock",
       },
       unlocking: { ko: "해제 중...", en: "Unlocking..." },
       live: { ko: "LIVE", en: "LIVE" },

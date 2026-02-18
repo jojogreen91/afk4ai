@@ -1,7 +1,7 @@
 "use client";
 
 import { type Lang, t } from "../../i18n";
-import { ClockIcon } from "../icons";
+import { ClockIcon, CatIcon } from "../icons";
 import { useClock } from "../../hooks/useClock";
 import { useBattery } from "../../hooks/useBattery";
 
@@ -23,6 +23,11 @@ export function TimerBar({ formatted, lang }: TimerBarProps) {
       }}
     >
       <div className="flex items-center justify-center gap-5 text-sm md:text-base">
+        {/* Left cat */}
+        <span className="animate-cat-walk">
+          <CatIcon color="var(--theme-primary)" size={24} />
+        </span>
+
         {/* LIVE indicator — green */}
         <div className="flex items-center gap-1.5">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse-dot" />
@@ -60,6 +65,11 @@ export function TimerBar({ formatted, lang }: TimerBarProps) {
             </div>
           </>
         )}
+
+        {/* Right cat */}
+        <span className="animate-cat-walk" style={{ animationDelay: "-0.2s" }}>
+          <CatIcon color="var(--theme-primary)" size={24} />
+        </span>
       </div>
     </div>
   );
