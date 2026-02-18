@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { type Lang, t } from "../i18n";
+import { CatIcon } from "../components/icons";
 
 function getDefaultLang(): Lang {
   if (typeof navigator === "undefined") return "ko";
@@ -9,8 +10,8 @@ function getDefaultLang(): Lang {
   return browserLang.startsWith("ko") ? "ko" : "en";
 }
 
-const GITHUB_RELEASE_URL =
-  "https://github.com/jojogreen91/afk4ai/releases/latest";
+const WEB_APP_URL = "/";
+const GITHUB_URL = "https://github.com/jojogreen91/afk4ai";
 
 function LangToggle({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
   return (
@@ -28,11 +29,14 @@ function NavBar({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-surface/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <div className="flex items-center gap-4">
-          <span className="text-2xl font-extrabold tracking-tight text-ember">AFK4AI</span>
+          <span className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-ember">
+            <CatIcon color="#FF4D00" size={26} />
+            AFK4AI
+          </span>
           <span className="hidden items-center gap-3 text-xs text-text-secondary md:flex">
             <span className="text-border">|</span>
-            <a href="https://github.com/jojogreen91" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 transition hover:text-text-primary">
-              <GithubIcon /> jojogreen91
+            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 transition hover:text-text-primary">
+              <GithubIcon /> GitHub
             </a>
             <a href="mailto:iawbg13@gmail.com" className="flex items-center gap-1 transition hover:text-text-primary">
               <MailIcon /> iawbg13@gmail.com
@@ -48,12 +52,10 @@ function NavBar({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
           </a>
           <LangToggle lang={lang} setLang={setLang} />
           <a
-            href={GITHUB_RELEASE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={WEB_APP_URL}
             className="rounded-lg bg-ember px-4 py-2 text-sm font-semibold text-white transition hover:bg-ember-light"
           >
-            {t.nav.download[lang]}
+            {t.nav.start[lang]}
           </a>
         </div>
       </div>
@@ -69,7 +71,7 @@ function HeroSection({ lang }: { lang: Lang }) {
       <div className="relative z-10 mx-auto max-w-3xl text-center">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface-light px-4 py-1.5 text-sm text-text-secondary">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-status-green animate-pulse-dot" />
-          macOS 14.0+ &middot; Apple Silicon &amp; Intel
+          Chrome &middot; Edge &middot; Desktop &middot; {lang === "ko" ? "설치 불필요" : "No Install"}
         </div>
 
         <h1 className="mb-5 text-5xl leading-tight font-extrabold tracking-tight md:text-7xl md:leading-tight">
@@ -86,19 +88,11 @@ function HeroSection({ lang }: { lang: Lang }) {
 
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
-            href={GITHUB_RELEASE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={WEB_APP_URL}
             className="inline-flex items-center gap-2 rounded-xl bg-ember px-8 py-4 text-lg font-bold text-white shadow-lg shadow-ember/20 transition hover:bg-ember-light hover:shadow-xl hover:shadow-ember/30"
           >
-            <DownloadIcon />
+            <ArrowRightIcon />
             {t.hero.cta[lang]}
-          </a>
-          <a
-            href="/"
-            className="inline-flex items-center gap-2 rounded-xl border border-ember/50 bg-ember/10 px-8 py-4 text-lg font-semibold text-ember transition hover:bg-ember/20 hover:border-ember"
-          >
-            {lang === "ko" ? "웹 버전 사용해보기" : "Try Web Version"}
           </a>
           <a
             href="#features"
@@ -115,8 +109,8 @@ function HeroSection({ lang }: { lang: Lang }) {
 
           {/* Marquee Banner */}
           <div className="relative overflow-hidden bg-ember py-2.5 shadow-lg shadow-ember/30">
-            <div className="flex animate-marquee items-center gap-6 whitespace-nowrap" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-              {[...Array(8)].map((_, i) => (
+            <div className="flex animate-marquee items-center whitespace-nowrap" style={{ fontFamily: "'JetBrains Mono', monospace", gap: "1.5rem" }}>
+              {[...Array(20)].map((_, i) => (
                 <span key={i} className="flex items-center gap-2 text-sm font-bold tracking-widest text-black md:text-base">
                   <WarningIcon /> AFK4AI
                 </span>
@@ -124,56 +118,51 @@ function HeroSection({ lang }: { lang: Lang }) {
             </div>
           </div>
 
-          {/* Metrics Bar */}
+          {/* Timer Bar — matches web app (LIVE, time, elapsed, battery) */}
           <div className="border-y border-ember/30 bg-black/60 px-3 py-2.5 md:px-5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-            <div className="flex items-center justify-between gap-2 text-[10px] md:text-[11px]">
-              {/* Elapsed Time */}
+            <div className="flex items-center justify-center gap-4 text-[10px] md:gap-5 md:text-[11px]">
+              {/* Cat left */}
+              <CatIcon color="#FF4D00" size={18} />
+
+              {/* LIVE */}
+              <div className="flex items-center gap-1.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse-dot" />
+                <span className="text-xs font-bold text-green-400">LIVE</span>
+              </div>
+
+              <span className="text-white/20">&middot;</span>
+
+              {/* Current time */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-white/50">{lang === "ko" ? "현재 시간" : "NOW"}</span>
+                <span className="font-bold text-white/90">14:32</span>
+              </div>
+
+              <span className="text-white/20">&middot;</span>
+
+              {/* Elapsed */}
               <div className="flex items-center gap-1.5">
                 <ClockIcon />
-                <span className="text-xs font-bold text-ember md:text-sm">01:23:45</span>
+                <span className="text-sm font-bold text-ember md:text-base">01:23:45</span>
+                <span className="text-white/50">{lang === "ko" ? "경과" : "elapsed"}</span>
               </div>
-              <div className="h-4 w-px bg-ember/20" />
-              {/* CPU */}
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-text-secondary">CPU</span>
-                <div className="h-1 w-10 overflow-hidden rounded-full bg-white/10 md:w-14">
-                  <div className="h-full w-[34%] rounded-full bg-ember/85" />
-                </div>
-                <span className="text-ember font-semibold">34%</span>
-              </div>
-              <div className="hidden h-4 w-px bg-ember/20 md:block" />
-              {/* MEM */}
+
+              <span className="hidden text-white/20 md:inline">&middot;</span>
+
+              {/* Battery */}
               <div className="hidden items-center gap-1.5 md:flex">
-                <span className="font-bold text-text-secondary">MEM</span>
-                <div className="h-1 w-14 overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full w-[53%] rounded-full bg-ember/85" />
-                </div>
-                <span className="text-ember font-semibold">8.5/16GB</span>
+                <BatteryIcon />
+                <span className="text-white/70">87%</span>
               </div>
-              <div className="hidden h-4 w-px bg-ember/20 md:block" />
-              {/* GPU */}
-              <div className="hidden items-center gap-1.5 md:flex">
-                <span className="font-bold text-text-secondary">GPU</span>
-                <div className="h-1 w-14 overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full w-[62%] rounded-full bg-ember/85" />
-                </div>
-                <span className="text-ember font-semibold">62%</span>
-              </div>
-              <div className="hidden h-4 w-px bg-ember/20 lg:block" />
-              {/* NET */}
-              <div className="hidden items-center gap-1.5 lg:flex">
-                <span className="font-bold text-text-secondary">NET</span>
-                <span className="text-text-secondary">&uarr;</span>
-                <span className="text-ember font-semibold">1.2MB</span>
-                <span className="text-text-secondary">&darr;</span>
-                <span className="text-ember font-semibold">4.8MB</span>
-              </div>
+
+              {/* Cat right */}
+              <CatIcon color="#FF4D00" size={18} />
             </div>
           </div>
 
           {/* Stream Area */}
           <div className="relative mx-4 my-4 overflow-hidden rounded-lg border border-ember/15 bg-[#0A0A0A] md:mx-5 md:my-5">
-            {/* Fake captured window content */}
+            {/* Fake captured screen content */}
             <div className="px-5 py-6 md:px-8 md:py-10">
               <div className="space-y-2.5">
                 <div className="flex items-center gap-2">
@@ -202,13 +191,21 @@ function HeroSection({ lang }: { lang: Lang }) {
             </div>
           </div>
 
-          {/* Unlock Area */}
+          {/* Unlock Area — long-press style */}
           <div className="flex flex-col items-center gap-2 px-6 pb-6 pt-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-7 py-3">
-              <TouchIdIcon />
-              <span className="text-sm font-bold text-white/70" style={{ fontFamily: "'JetBrains Mono', monospace" }}>잠금 해제</span>
+            <div className="relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-7 py-3">
+              {/* Progress ring indicator */}
+              <svg width="18" height="18" viewBox="0 0 20 20" className="text-white/50">
+                <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.2" />
+                <circle cx="10" cy="10" r="8" fill="none" stroke="#FF4D00" strokeWidth="2" strokeDasharray="50.3" strokeDashoffset="25" strokeLinecap="round" transform="rotate(-90 10 10)" />
+              </svg>
+              <span className="text-sm font-bold text-white/70" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                {lang === "ko" ? "잠금 해제" : "Unlock"}
+              </span>
             </div>
-            <span className="text-[10px] text-white/20" style={{ fontFamily: "'JetBrains Mono', monospace" }}>비상 탈출</span>
+            <span className="text-[10px] text-white/20" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+              {lang === "ko" ? "2초간 길게 누르기" : "Hold for 2 seconds"}
+            </span>
           </div>
         </div>
       </div>
@@ -224,7 +221,7 @@ function HeroSection({ lang }: { lang: Lang }) {
 }
 
 function FeaturesSection({ lang }: { lang: Lang }) {
-  const icons = [<WindowIcon key={0} />, <ShieldIcon key={1} />, <FingerprintIcon key={2} />, <ChartIcon key={3} />, <PaletteIcon key={4} />, <MenuBarIcon key={5} />];
+  const icons = [<WindowIcon key={0} />, <ShieldIcon key={1} />, <HoldIcon key={2} />, <ChartIcon key={3} />, <PaletteIcon key={4} />, <GlobeIcon key={5} />];
 
   return (
     <section id="features" className="px-6 py-20 md:py-24">
@@ -302,12 +299,10 @@ function CtaSection({ lang }: { lang: Lang }) {
           {t.cta.subtitle[lang]}
         </p>
         <a
-          href={GITHUB_RELEASE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={WEB_APP_URL}
           className="inline-flex items-center gap-2.5 rounded-xl bg-ember px-9 py-4.5 text-xl font-bold text-white shadow-lg shadow-ember/20 transition hover:bg-ember-light hover:shadow-xl hover:shadow-ember/30"
         >
-          <DownloadIcon />
+          <ArrowRightIcon />
           {t.cta.button[lang]}
         </a>
         <p className="mt-5 text-xs text-text-secondary">
@@ -322,16 +317,19 @@ function Footer() {
   return (
     <footer className="border-t border-border px-6 py-8">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 text-sm text-text-secondary">
-        <span className="text-ember font-bold text-lg">AFK4AI</span>
+        <span className="flex items-center gap-2 text-lg font-bold text-ember">
+          <CatIcon color="#FF4D00" size={22} />
+          AFK4AI
+        </span>
         <div className="flex items-center gap-5 text-sm">
           <a
-            href="https://github.com/jojogreen91"
+            href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 transition hover:text-text-primary"
           >
             <GithubIcon />
-            jojogreen91
+            GitHub
           </a>
           <a
             href="mailto:iawbg13@gmail.com"
@@ -349,10 +347,10 @@ function Footer() {
 
 // --- Icons ---
 
-function DownloadIcon() {
+function ArrowRightIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5M3 15v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
@@ -374,12 +372,12 @@ function ClockIcon() {
   );
 }
 
-function TouchIdIcon() {
+function BatteryIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/70">
-      <path d="M12 2a10 10 0 00-7.07 2.93M12 2a10 10 0 017.07 2.93M12 22a10 10 0 007.07-2.93M12 22a10 10 0 01-7.07-2.93" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M12 8a4 4 0 00-4 4v2a4 4 0 008 0v-2a4 4 0 00-4-4z" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M12 12v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    <svg width="18" height="10" viewBox="0 0 20 12" fill="none">
+      <rect x="0.5" y="0.5" width="16" height="11" rx="2" stroke="currentColor" strokeWidth="1" className="text-white/40" />
+      <rect x="17" y="3" width="2.5" height="6" rx="1" fill="currentColor" className="text-white/40" />
+      <rect x="2" y="2" width="11" height="8" rx="1" fill="#FF4D00" />
     </svg>
   );
 }
@@ -405,14 +403,12 @@ function ShieldIcon() {
   );
 }
 
-function FingerprintIcon() {
+function HoldIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path d="M12 10a2 2 0 012 2c0 1.02-.1 2.01-.3 2.96" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M6.72 16A10.97 10.97 0 016 12a6 6 0 0112 0c0 .83-.05 1.64-.15 2.43" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M17.64 7.96A7.97 7.97 0 0020 12c0 .85-.06 1.68-.18 2.49" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M4 12a8 8 0 0116 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M12 12v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="1.5" strokeDasharray="37.7" strokeDashoffset="9.4" strokeLinecap="round" transform="rotate(-90 12 12)"/>
+      <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
     </svg>
   );
 }
@@ -439,13 +435,11 @@ function PaletteIcon() {
   );
 }
 
-function MenuBarIcon() {
+function GlobeIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <rect x="2" y="3" width="20" height="5" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="18" cy="5.5" r="1" fill="currentColor"/>
-      <circle cx="15" cy="5.5" r="1" fill="currentColor"/>
-      <rect x="2" y="11" width="20" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
     </svg>
   );
 }

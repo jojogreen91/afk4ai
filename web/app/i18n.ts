@@ -4,63 +4,63 @@ export const t = {
   nav: {
     features: { ko: "기능", en: "Features" },
     howItWorks: { ko: "사용법", en: "How It Works" },
-    download: { ko: "다운로드", en: "Download" },
+    start: { ko: "시작하기", en: "Get Started" },
     madeBy: { ko: "만든 사람", en: "Made by" },
     openSource: { ko: "오픈소스 프로젝트", en: "Open Source Project" },
   },
   hero: {
-    title1: { ko: "컴퓨터는 일하는 중.", en: "Your Mac is working." },
+    title1: { ko: "컴퓨터는 일하는 중.", en: "Your computer is working." },
     title2: { ko: "고양이는 터치 금지.", en: "Paws off the keyboard." },
     description: {
       ko: "AI에게 작업을 맡기고 자리를 비울 때, 고양이나 지나가는 누군가가",
-      en: "When you leave your Mac running AI tasks, lock the screen so",
+      en: "When you step away from your AI tasks, lock the screen so",
     },
     descriptionBr: {
       ko: "키보드를 밟아도 걱정 없도록. 화면을 잠그고 실시간으로 지켜보세요.",
       en: "curious cats and passersby can't mess things up. Monitor in real time.",
     },
-    cta: { ko: "무료 다운로드", en: "Free Download" },
+    cta: { ko: "지금 시작하기", en: "Start Now" },
     learnMore: { ko: "자세히 보기", en: "Learn More" },
     scroll: { ko: "스크롤", en: "Scroll" },
   },
   features: {
     title: { ko: "", en: "" },
-    titleEnd: { ko: "가 맥북을 지켜줍니다", en: " guards your Mac" },
+    titleEnd: { ko: "가 화면을 지켜줍니다", en: " guards your screen" },
     subtitle1: {
       ko: "AI 작업 돌려놓고 밖에 나가세요.",
       en: "Run your AI tasks, lock the screen, and step outside.",
     },
     subtitle2: {
-      ko: "화면 잠그고 실시간으로 확인하면 됩니다.",
-      en: "Monitor everything in real time.",
+      ko: "브라우저만 있으면 됩니다.",
+      en: "All you need is a browser.",
     },
     items: [
       {
-        title: { ko: "실시간 윈도우 미러링", en: "Live Window Mirroring" },
+        title: { ko: "실시간 화면 캡처", en: "Live Screen Capture" },
         description: {
-          ko: "잠금 화면에서 작업 중인 윈도우를 실시간으로 볼 수 있습니다. 밖에서 폰으로 확인할 필요 없이, 돌아와서 화면만 보면 됩니다.",
-          en: "Watch your working window in real time on the lock screen. No need to check your phone — just come back and see.",
+          ko: "Screen Capture API로 선택한 화면을 실시간으로 잠금 화면에 표시합니다. 돌아와서 화면만 보면 됩니다.",
+          en: "Uses the Screen Capture API to display your selected screen live on the lock screen. Just come back and see.",
         },
       },
       {
-        title: { ko: "완벽한 입력 차단", en: "Complete Input Blocking" },
+        title: { ko: "풀스크린 잠금", en: "Fullscreen Lock" },
         description: {
-          ko: "키보드와 마우스 입력을 시스템 레벨에서 차단합니다. 고양이가 키보드 위를 걸어다녀도, 아이가 마우스를 잡아도 안전합니다.",
-          en: "Blocks all keyboard and mouse input at the system level. Safe from cats walking on the keyboard or kids grabbing the mouse.",
+          ko: "브라우저 전체 화면으로 잠기고, Chrome/Edge에서는 ESC 키까지 차단합니다. 고양이가 키보드를 밟아도 안전합니다.",
+          en: "Locks in fullscreen mode. Chrome/Edge even blocks the ESC key. Safe from cats walking across the keyboard.",
         },
       },
       {
-        title: { ko: "Touch ID 잠금 해제", en: "Touch ID Unlock" },
+        title: { ko: "길게 눌러 잠금 해제", en: "Long-Press Unlock" },
         description: {
-          ko: "Touch ID 또는 비밀번호로 안전하게 잠금을 해제하세요. 본인만이 잠금을 풀 수 있습니다.",
-          en: "Unlock securely with Touch ID or password. Only you can unlock it.",
+          ko: "2초간 길게 눌러야 잠금이 해제됩니다. 고양이 발이나 실수로는 절대 풀리지 않습니다.",
+          en: "Hold for 2 seconds to unlock. Cat paws or accidental touches won't unlock it.",
         },
       },
       {
-        title: { ko: "시스템 메트릭스", en: "System Metrics" },
+        title: { ko: "배터리 & 시간 모니터링", en: "Battery & Time Monitor" },
         description: {
-          ko: "CPU, GPU, 메모리, 네트워크 사용량을 잠금 화면에서 실시간으로 확인하세요. 돌아와서 한눈에 상태를 파악할 수 있습니다.",
-          en: "Monitor CPU, GPU, memory, and network usage in real time on the lock screen. See the status at a glance when you return.",
+          ko: "배터리 잔량, 현재 시간, 경과 시간을 잠금 화면에서 실시간으로 확인하세요. 돌아와서 한눈에 파악.",
+          en: "Monitor battery level, current time, and elapsed time in real time on the lock screen. See everything at a glance.",
         },
       },
       {
@@ -71,10 +71,10 @@ export const t = {
         },
       },
       {
-        title: { ko: "메뉴바 상주", en: "Menu Bar App" },
+        title: { ko: "설치 없이 바로 사용", en: "No Installation Needed" },
         description: {
-          ko: "메뉴바에서 빠르게 잠금을 걸고 해제할 수 있습니다. 한 클릭이면 충분합니다.",
-          en: "Lock and unlock quickly from the menu bar. One click is all it takes.",
+          ko: "앱 설치 없이 브라우저만으로 바로 사용할 수 있습니다. Chrome 또는 Edge를 추천합니다.",
+          en: "Works right in your browser — no app installation required. Chrome or Edge recommended.",
         },
       },
     ],
@@ -84,24 +84,31 @@ export const t = {
     title2: { ko: "간단합니다", en: "simple" },
     steps: [
       {
-        title: { ko: "윈도우 선택", en: "Select a window" },
+        title: { ko: "웹사이트 접속", en: "Open the web app" },
         description: {
-          ko: "지켜보고 싶은 윈도우를 선택하세요. 실행 중인 모든 앱의 윈도우 목록이 표시됩니다.",
-          en: "Choose the window you want to watch. All running app windows are listed.",
+          ko: "브라우저에서 AFK4AI를 열어주세요. 설치할 것은 아무것도 없습니다.",
+          en: "Open AFK4AI in your browser. Nothing to install.",
         },
       },
       {
-        title: { ko: "잠금 & 자리 비우기", en: "Lock & walk away" },
+        title: { ko: "화면 선택", en: "Select your screen" },
         description: {
-          ko: "Lock 버튼을 누르면 전체 화면이 잠기고, 선택한 윈도우가 실시간으로 미러링됩니다. 이제 안심하고 자리를 비우세요.",
-          en: "Hit Lock and the screen locks with a live mirror of your selected window. Walk away with peace of mind.",
+          ko: "지켜보고 싶은 화면을 선택하세요. 브라우저가 화면 공유를 요청합니다.",
+          en: "Choose the screen you want to watch. Your browser will ask to share the screen.",
         },
       },
       {
-        title: { ko: "돌아와서 Touch ID", en: "Come back & Touch ID" },
+        title: { ko: "ACTIVATE", en: "ACTIVATE" },
         description: {
-          ko: "돌아오면 Touch ID 또는 비밀번호로 잠금을 해제하세요. 그게 전부입니다.",
-          en: "When you're back, unlock with Touch ID or password. That's it.",
+          ko: "ACTIVATE 버튼을 누르면 전체 화면이 잠기고, 선택한 화면이 실시간으로 미러링됩니다. 안심하고 자리를 비우세요.",
+          en: "Hit ACTIVATE and the screen locks fullscreen with a live mirror. Walk away with peace of mind.",
+        },
+      },
+      {
+        title: { ko: "돌아와서 길게 누르기", en: "Come back & long-press" },
+        description: {
+          ko: "돌아오면 잠금 해제 버튼을 2초간 길게 눌러주세요. 그게 전부입니다.",
+          en: "When you're back, hold the unlock button for 2 seconds. That's it.",
         },
       },
     ],
@@ -109,13 +116,13 @@ export const t = {
   cta: {
     title: { ko: "지금 바로 시작하세요", en: "Get started now" },
     subtitle: {
-      ko: "무료로 다운로드하고 안심하고 자리를 비우세요.",
-      en: "Download for free and leave your desk worry-free.",
+      ko: "브라우저만 있으면 됩니다. 설치 없이 바로 시작하세요.",
+      en: "All you need is a browser. Start right away, no installation.",
     },
-    button: { ko: "Download for macOS", en: "Download for macOS" },
+    button: { ko: "지금 시작하기", en: "Start Now" },
     footnote: {
-      ko: "macOS 14.0 (Sonoma) 이상 · Apple Silicon & Intel 지원 · 무료",
-      en: "macOS 14.0 (Sonoma) or later · Apple Silicon & Intel · Free",
+      ko: "Chrome · Edge 권장 · 데스크탑 브라우저 · 무료",
+      en: "Chrome · Edge recommended · Desktop browser · Free",
     },
   },
   webapp: {
