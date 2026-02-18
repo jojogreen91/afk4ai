@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Lang, t } from "./i18n";
+import { type Lang, t } from "../i18n";
 
 function getDefaultLang(): Lang {
   if (typeof navigator === "undefined") return "ko";
@@ -93,6 +93,12 @@ function HeroSection({ lang }: { lang: Lang }) {
           >
             <DownloadIcon />
             {t.hero.cta[lang]}
+          </a>
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl border border-ember/50 bg-ember/10 px-8 py-4 text-lg font-semibold text-ember transition hover:bg-ember/20 hover:border-ember"
+          >
+            {lang === "ko" ? "웹 버전 사용해보기" : "Try Web Version"}
           </a>
           <a
             href="#features"

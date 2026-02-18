@@ -118,4 +118,46 @@ export const t = {
       en: "macOS 14.0 (Sonoma) or later · Apple Silicon & Intel · Free",
     },
   },
+  webapp: {
+    setup: {
+      title: { ko: "화면 잠금 설정", en: "Lock Screen Setup" },
+      selectScreen: { ko: "화면 선택", en: "Select Screen" },
+      selectScreenDesc: {
+        ko: "잠금 화면에 미러링할 화면을 선택하세요.",
+        en: "Choose the screen to mirror on the lock screen.",
+      },
+      selectScreenTip: {
+        ko: "💡 다른 데스크탑의 창도 보려면 \"전체 화면\"을 선택하세요.",
+        en: "💡 Select \"Entire Screen\" to capture windows across all desktops.",
+      },
+      selectTheme: { ko: "테마 선택", en: "Select Theme" },
+      activate: { ko: "ACTIVATE", en: "ACTIVATE" },
+      activateDesc: {
+        ko: "화면을 잠그고 모니터링을 시작합니다.",
+        en: "Lock the screen and start monitoring.",
+      },
+      browserWarning: {
+        ko: "Chrome/Edge에서만 ESC 키 차단이 가능합니다. 다른 브라우저에서는 ESC로 풀스크린이 해제될 수 있습니다.",
+        en: "ESC key blocking only works in Chrome/Edge. In other browsers, ESC may exit fullscreen.",
+      },
+      clickToSelect: {
+        ko: "클릭하여 화면 선택",
+        en: "Click to select screen",
+      },
+      screenSelected: {
+        ko: "화면이 선택되었습니다",
+        en: "Screen selected",
+      },
+      landing: { ko: "랜딩 페이지로", en: "Landing Page" },
+    },
+    lock: {
+      elapsed: { ko: "경과 시간", en: "Elapsed" },
+      unlockHint: {
+        ko: "잠금 해제하려면 3초간 길게 누르세요",
+        en: "Hold for 3 seconds to unlock",
+      },
+      unlocking: { ko: "해제 중...", en: "Unlocking..." },
+      live: { ko: "LIVE", en: "LIVE" },
+    },
+  },
 } as const;

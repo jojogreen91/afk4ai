@@ -13,6 +13,13 @@
   --color-status-green: #00FF41;
 }
 
+:root {
+  --theme-primary: #FF4D00;
+  --theme-primary-light: #FF6B2B;
+  --theme-banner-text: #000;
+  --theme-status: #00FF41;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -63,4 +70,32 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Long-press unlock animation */
+@keyframes long-press-fill {
+  0% { stroke-dashoffset: 283; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.long-press-ring {
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 0.1s ease-out;
+}
+
+.long-press-ring.pressing {
+  animation: long-press-fill 3s linear forwards;
+}
+
+/* Scanline overlay for lock screen */
+.scanline-overlay {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.25) 3px,
+    rgba(0, 0, 0, 0.25) 4px
+  );
+  opacity: 0.08;
 }
