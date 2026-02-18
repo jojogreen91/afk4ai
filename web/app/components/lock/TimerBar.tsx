@@ -4,7 +4,6 @@ import { type Lang, t } from "../../i18n";
 import { ClockIcon } from "../icons";
 import { useClock } from "../../hooks/useClock";
 import { useBattery } from "../../hooks/useBattery";
-import { useNetwork } from "../../hooks/useNetwork";
 
 interface TimerBarProps {
   formatted: string;
@@ -14,60 +13,53 @@ interface TimerBarProps {
 export function TimerBar({ formatted, lang }: TimerBarProps) {
   const clock = useClock();
   const battery = useBattery();
-  const network = useNetwork();
 
   return (
     <div
-      className="border-y px-4 py-3 md:px-6"
+      className="px-5 py-4 md:px-8"
       style={{
-        borderColor: "color-mix(in srgb, var(--theme-primary) 30%, transparent)",
-        backgroundColor: "rgba(0,0,0,0.6)",
+        backgroundColor: "rgba(0,0,0,0.4)",
         fontFamily: "'JetBrains Mono', monospace",
       }}
     >
-      <div className="flex items-center justify-between gap-4 text-xs md:text-sm">
+      <div className="flex items-center justify-center gap-5 text-sm md:text-base">
+        {/* LIVE indicator — green */}
+        <div className="flex items-center gap-1.5">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse-dot" />
+          <span className="text-sm font-bold text-green-400">LIVE</span>
+        </div>
+
+        <span className="text-white/20">·</span>
+
         {/* Current time */}
         <div className="flex items-center gap-1.5">
-          <span className="text-white/50">{lang === "ko" ? "현재" : "NOW"}</span>
+          <span className="text-white/50">{lang === "ko" ? "현재 시간" : "NOW"}</span>
           <span className="font-bold text-white/90">{clock}</span>
         </div>
+
+        <span className="text-white/20">·</span>
 
         {/* Elapsed */}
         <div className="flex items-center gap-1.5">
           <ClockIcon />
-          <span className="text-lg font-bold md:text-xl" style={{ color: "var(--theme-primary)" }}>
+          <span className="text-xl font-bold md:text-2xl" style={{ color: "var(--theme-primary)" }}>
             {formatted}
           </span>
           <span className="text-white/50">{t.webapp.lock.elapsed[lang]}</span>
         </div>
 
-        {/* Network + Battery */}
-        <div className="flex items-center gap-3">
-          {/* Network */}
-          <div className="flex items-center gap-1.5">
-            <span
-              className="inline-block h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: network.online ? "var(--theme-status)" : "#ef4444" }}
-            />
-            <span className={network.online ? "text-white/70" : "text-red-400 font-bold"}>
-              {network.online
-                ? (network.downlink ? `${network.downlink} Mbps` : network.type.toUpperCase())
-                : "OFFLINE"}
-            </span>
-          </div>
-
-          <div className="h-3 w-px bg-white/15" />
-
-          {/* Battery */}
-          {battery.supported && (
+        {/* Battery */}
+        {battery.supported && (
+          <>
+            <span className="text-white/20">·</span>
             <div className="flex items-center gap-1.5">
               <BatteryIcon level={battery.level} charging={battery.charging} />
               <span className="text-white/70">
                 {Math.round(battery.level * 100)}%
               </span>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

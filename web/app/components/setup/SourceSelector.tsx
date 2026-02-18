@@ -26,7 +26,10 @@ export function SourceSelector({
       </p>
       <button
         onClick={onSelect}
-        className="group w-full overflow-hidden rounded-xl border border-white/15 bg-white/5 transition hover:border-[var(--theme-primary)]/50 hover:bg-white/10"
+        className="group w-full overflow-hidden rounded-2xl border border-white/15 bg-white/5 transition-all duration-200 hover:border-[var(--theme-primary)]/50 hover:bg-white/10 hover:scale-[1.02]"
+        style={{ transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease" }}
+        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 4px 24px color-mix(in srgb, var(--theme-primary) 20%, transparent)`; }}
+        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; }}
       >
         {thumbnail ? (
           <div className="relative">

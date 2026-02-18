@@ -2,22 +2,39 @@
 
 import { WarningIcon } from "../icons";
 
+const ITEMS = 20;
+
 export function MarqueeBanner() {
+  const segment = Array.from({ length: ITEMS }, (_, i) => (
+    <span
+      key={i}
+      className="flex items-center gap-2.5 text-base font-bold tracking-widest md:text-lg"
+      style={{ color: "var(--theme-banner-text)" }}
+    >
+      <WarningIcon /> AFK4AI
+    </span>
+  ));
+
   return (
-    <div className="relative overflow-hidden py-2.5 shadow-lg" style={{ backgroundColor: "var(--theme-primary)", boxShadow: `0 4px 14px color-mix(in srgb, var(--theme-primary) 30%, transparent)` }}>
+    <div
+      className="relative overflow-hidden py-3"
+      style={{
+        backgroundColor: "var(--theme-primary)",
+        boxShadow: `0 4px 14px color-mix(in srgb, var(--theme-primary) 30%, transparent)`,
+      }}
+    >
       <div
-        className="flex animate-marquee items-center gap-6 whitespace-nowrap"
-        style={{ fontFamily: "'JetBrains Mono', monospace" }}
+        className="flex items-center gap-6 whitespace-nowrap"
+        style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          animation: "marquee 30s linear infinite",
+          width: "max-content",
+        }}
       >
-        {[...Array(16)].map((_, i) => (
-          <span
-            key={i}
-            className="flex items-center gap-2 text-sm font-bold tracking-widest md:text-base"
-            style={{ color: "var(--theme-banner-text)" }}
-          >
-            <WarningIcon /> AFK4AI
-          </span>
-        ))}
+        {/* First copy */}
+        <div className="flex items-center gap-6">{segment}</div>
+        {/* Duplicate copy for seamless loop */}
+        <div className="flex items-center gap-6">{segment}</div>
       </div>
     </div>
   );

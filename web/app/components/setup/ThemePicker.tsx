@@ -25,11 +25,13 @@ export function ThemePicker({ selected, onSelect, lang }: ThemePickerProps) {
             <button
               key={key}
               onClick={() => onSelect(key)}
-              className="group relative flex flex-col items-center gap-2 rounded-xl border p-3 transition"
+              className="group relative flex flex-col items-center gap-2 rounded-2xl border p-3 transition-all duration-200 hover:scale-[1.02]"
               style={{
                 borderColor: isSelected ? theme.primary : "rgba(255,255,255,0.1)",
                 backgroundColor: isSelected ? `color-mix(in srgb, ${theme.primary} 10%, transparent)` : "rgba(255,255,255,0.03)",
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 4px 24px color-mix(in srgb, ${theme.primary} 25%, transparent)`; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; }}
             >
               {/* Gradient swatch */}
               <div

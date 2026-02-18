@@ -3,14 +3,12 @@
 import { useEffect, useRef } from "react";
 import { type Lang } from "../../i18n";
 import { ScanlineOverlay } from "./ScanlineOverlay";
-import { LiveBadge } from "./LiveBadge";
 
 interface StreamAreaProps {
   stream: MediaStream;
-  lang: Lang;
 }
 
-export function StreamArea({ stream, lang }: StreamAreaProps) {
+export function StreamArea({ stream }: StreamAreaProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -21,8 +19,7 @@ export function StreamArea({ stream, lang }: StreamAreaProps) {
 
   return (
     <div
-      className="relative mx-4 my-4 overflow-hidden rounded-lg border bg-[#0A0A0A] md:mx-5 md:my-5"
-      style={{ borderColor: "color-mix(in srgb, var(--theme-primary) 15%, transparent)" }}
+      className="relative mx-5 overflow-hidden rounded-2xl bg-[#0A0A0A] md:mx-8"
     >
       <video
         ref={videoRef}
@@ -30,10 +27,9 @@ export function StreamArea({ stream, lang }: StreamAreaProps) {
         muted
         playsInline
         className="w-full"
-        style={{ maxHeight: "calc(100vh - 280px)" }}
+        style={{ maxHeight: "calc(100vh - 340px)" }}
       />
       <ScanlineOverlay />
-      <LiveBadge lang={lang} />
     </div>
   );
 }

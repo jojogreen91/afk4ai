@@ -99,3 +99,61 @@ body {
   );
   opacity: 0.08;
 }
+
+/* Cat wiggle animation */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-8deg); }
+  40% { transform: rotate(8deg); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(4deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.6s ease-in-out;
+}
+
+/* Cat blink (idle) animation */
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+.animate-blink {
+  animation: blink 3s ease-in-out infinite;
+}
+
+/* Floating cat animation for lock screen background */
+@keyframes float-cat {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(10px, -15px) rotate(3deg); }
+  50% { transform: translate(-5px, -25px) rotate(-2deg); }
+  75% { transform: translate(-15px, -10px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.animate-float-cat {
+  animation: float-cat var(--float-duration, 20s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+/* Cat walk animation — trotting bob */
+@keyframes cat-walk {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-2px) rotate(-2deg); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(-2px) rotate(2deg); }
+}
+
+.animate-cat-walk {
+  animation: cat-walk 0.4s ease-in-out infinite;
+}
+
+/* Mouse glow background */
+.mouse-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: background 0.15s ease;
+}

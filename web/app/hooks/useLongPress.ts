@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 
-const LONG_PRESS_DURATION = 1500; // 1.5 seconds
+const LONG_PRESS_DURATION = 2000; // 2 seconds
 const PROGRESS_INTERVAL = 16; // ~60fps
 
 export function useLongPress(onComplete: () => void) {

@@ -8,7 +8,7 @@ interface UnlockAreaProps {
   lang: Lang;
 }
 
-const SIZE = 88;
+const SIZE = 96;
 const STROKE = 3;
 const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -20,7 +20,7 @@ export function UnlockArea({ onUnlock, lang }: UnlockAreaProps) {
   return (
     <div
       data-unlock-area
-      className="flex flex-col items-center gap-3 px-6 pb-8 pt-6"
+      className="flex flex-col items-center gap-4 px-6 py-6"
     >
       <button
         className="relative flex items-center justify-center select-none"
@@ -63,15 +63,15 @@ export function UnlockArea({ onUnlock, lang }: UnlockAreaProps) {
           />
         </svg>
         {/* Inner circle + icon */}
-        <div className="relative z-10 flex h-[76px] w-[76px] items-center justify-center rounded-full border border-white/25 bg-white/10">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-white/90">
+        <div className="relative z-10 flex h-[82px] w-[82px] items-center justify-center rounded-full border border-white/25 bg-white/10">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-white/90">
             <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
             <path d="M7 11V7a5 5 0 019.9-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </div>
       </button>
       <span
-        className="text-[11px] text-white/60 select-none"
+        className="text-xs text-white/60 select-none"
         style={{ fontFamily: "'JetBrains Mono', monospace" }}
       >
         {pressing

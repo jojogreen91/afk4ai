@@ -5,6 +5,7 @@ export interface ThemeColors {
   primaryLight: string;
   bannerText: string;
   status: string;
+  bg: string;
 }
 
 export const THEMES: Record<ThemeKey, ThemeColors> = {
@@ -13,24 +14,28 @@ export const THEMES: Record<ThemeKey, ThemeColors> = {
     primaryLight: "#FF6B2B",
     bannerText: "#000",
     status: "#00FF41",
+    bg: "#0D0806",
   },
   mono: {
     primary: "#FFFFFF",
     primaryLight: "#888888",
     bannerText: "#000",
     status: "#AAAAAA",
+    bg: "#0A0A0A",
   },
   ocean: {
     primary: "#1E40AF",
     primaryLight: "#2563EB",
     bannerText: "#FFF",
     status: "#0E7490",
+    bg: "#060810",
   },
   matrix: {
     primary: "#059669",
     primaryLight: "#10B981",
     bannerText: "#FFF",
     status: "#34D399",
+    bg: "#060D08",
   },
 };
 
